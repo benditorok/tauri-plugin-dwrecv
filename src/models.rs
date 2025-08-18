@@ -19,24 +19,3 @@ pub struct DataWedgeData {
     pub timestamp: Option<String>,
     pub symbology: Option<String>,
 }
-
-#[derive(Debug, Deserialize, Serialize)]
-#[serde(rename_all = "camelCase")]
-pub struct SubscribeRequest {
-    pub intent_action: Option<String>,
-    pub intent_category: Option<String>,
-}
-
-#[derive(Debug, Clone, Default, Deserialize, Serialize)]
-#[serde(rename_all = "camelCase")]
-pub struct SubscribeResponse {
-    pub success: bool,
-    pub message: Option<String>,
-}
-
-#[derive(Debug, Clone, Default, Deserialize, Serialize)]
-#[serde(rename_all = "camelCase")]
-pub struct UnsubscribeResponse {
-    pub success: bool,
-    pub message: Option<String>,
-}
