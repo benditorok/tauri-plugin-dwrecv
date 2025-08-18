@@ -15,7 +15,7 @@ pub fn init<R: Runtime, C: DeserializeOwned>(
   api: PluginApi<R, C>,
 ) -> crate::Result<Dwrecv<R>> {
   #[cfg(target_os = "android")]
-  let handle = api.register_android_plugin("", "ExamplePlugin")?;
+  let handle = api.register_android_plugin("", "DWIntentReciever")?;
   #[cfg(target_os = "ios")]
   let handle = api.register_ios_plugin(init_plugin_dwrecv)?;
   Ok(Dwrecv(handle))
@@ -29,6 +29,20 @@ impl<R: Runtime> Dwrecv<R> {
     self
       .0
       .run_mobile_plugin("ping", payload)
+      .map_err(Into::into)
+  }
+
+  pub fn subscribe_to_datawedge(&self, payload: SubscribeRequest) -> crate::Result<SubscribeResponse> {
+    self
+      .0
+      .run_mobile_plugin("subscribeToDataWedge", payload)
+      .map_err(Into::into)
+  }
+
+  pub fn unsubscribe_from_datawedge(&self) -> crate::Result<UnsubscribeResponse> {
+    self
+      .0
+      .run_mobile_plugin("unsubscribeFromDataWedge", ())
       .map_err(Into::into)
   }
 }

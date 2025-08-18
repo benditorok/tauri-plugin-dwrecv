@@ -19,4 +19,20 @@ impl<R: Runtime> Dwrecv<R> {
       value: payload.value,
     })
   }
+
+  pub fn subscribe_to_datawedge(&self, _payload: SubscribeRequest) -> crate::Result<SubscribeResponse> {
+    // Desktop doesn't support DataWedge intents
+    Ok(SubscribeResponse {
+      success: false,
+      message: Some("DataWedge is only available on Android devices".to_string()),
+    })
+  }
+
+  pub fn unsubscribe_from_datawedge(&self) -> crate::Result<UnsubscribeResponse> {
+    // Desktop doesn't support DataWedge intents
+    Ok(UnsubscribeResponse {
+      success: false,
+      message: Some("DataWedge is only available on Android devices".to_string()),
+    })
+  }
 }

@@ -1,3 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Permissions for DataWedge intent handling -->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+
+    <!-- Optional: If you need to programmatically control DataWedge -->
+    <uses-permission android:name="com.symbol.datawedge.api.PERMISSION" />
 </manifest>

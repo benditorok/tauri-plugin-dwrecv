@@ -35,12 +35,17 @@ impl<R: Runtime, T: Manager<R>> crate::DwrecvExt<R> for T {
 /// Initializes the plugin.
 pub fn init<R: Runtime>() -> TauriPlugin<R> {
     Builder::new("dwrecv")
-        .invoke_handler(tauri::generate_handler![commands::ping])
+        .invoke_handler(tauri::generate_handler![
+            commands::ping,
+            commands::subscribe_to_datawedge,
+            commands::unsubscribe_from_datawedge
+        ])
         .setup(|app, api| {
             #[cfg(mobile)]
             let dwrecv = mobile::init(app, api)?;
             #[cfg(target_os = "android")]
-            let handle = api.register_android_plugin("com.benditorok.dwrecv", "ExamplePlugin")?;
+            let handle =
+                api.register_android_plugin("com.benditorok.dwrecv", "DWIntentReciever")?;
             #[cfg(desktop)]
             let dwrecv = desktop::init(app, api)?;
             app.manage(dwrecv);
