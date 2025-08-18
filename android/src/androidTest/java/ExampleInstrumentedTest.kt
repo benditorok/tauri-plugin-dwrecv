@@ -20,5 +20,30 @@ class ExampleInstrumentedTest {
         // Context of the app under test.
         val appContext = InstrumentationRegistry.getInstrumentation().targetContext
         assertEquals("com.benditorok.dwrecv", appContext.packageName)
+
+        // Send intent
+        val intent = Intent(appContext, DWIntentReciever::class.java)
+        intent.putExtra("com.symbol.datawedge.data_string", "test_barcode")
+        intent.putExtra("com.symbol.datawedge.timestamp", System.currentTimeMillis())
+        intent.putExtra("com.symbol.datawedge.label_type", "QR_CODE")
+        appContext.sendBroadcast(intent)
+
+        // Verify the result
+        val result = InstrumentationRegistry.getInstrumentation().waitForIdleSync()
+        assertNotNull(result)
+
+        // Verify the broadcast
+        val broadcastReceiver = object : BroadcastReceiver() {
+            override fun onReceive(context: Context?, intent: Intent?) {
+                assertEquals("dw-scan", intent?.action)
+                val barcode = intent?.getStringExtra("barcode")
+                assertEquals("test_barcode", barcode)
+            }
+        }
+        val filter = IntentFilter("dw-scan")
+        appContext.registerReceiver(broadcastReceiver, filter)
+
+        // Clean up
+        appContext.unregisterReceiver(broadcastReceiver)
     }
 }
