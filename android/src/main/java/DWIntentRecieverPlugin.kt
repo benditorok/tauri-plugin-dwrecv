@@ -13,28 +13,41 @@ import app.tauri.plugin.JSObject
 import app.tauri.plugin.Plugin
 import app.tauri.plugin.Invoke
 
+/*
+ * Configuration class for DW intent receiver plugin
+ */
 @InvokeArg
-class PingArgs {
-    var value: String? = null
+class Config {
+    var pingvalue: String? = "pong"
+    var intentAction: String? = "com.symbol.datawedge.api.RESULT_ACTION"
 }
 
+/*
+ * DW intent receiver plugin
+ */
 @TauriPlugin
 class DWIntentRecieverPlugin(private val activity: Activity): Plugin(activity) {
-    // Default DataWedge intent action - can be customized
-    private var currentIntentAction = "com.symbol.datawedge.api.RESULT_ACTION"
-    private var currentIntentCategory = "android.intent.category.DEFAULT"
+    private var pingValue = "pong"
+    private var intentAction = "com.symbol.datawedge.api.RESULT_ACTION"
+
+    override fun load(webView: WebView) {
+        getConfig(Config::class.java).let {
+            this.pingValue = it.pingvalue ?: this.pingValue
+            this.intentAction = it.intentAction ?: this.intentAction
+        }
+    }
 
     @Command
     fun ping(invoke: Invoke) {
-        val args = invoke.parseArgs(PingArgs::class.java)
-        val ret = JSObject()
-        ret.put("value", args.value ?: "pong")
+        val ret = JSObject().apply {
+            put("value", pingValue)
+        }
         invoke.resolve(ret)
     }
 
     override fun onNewIntent(intent: Intent) {
         // Handle direct intent launches if needed
-        if (intent.action != currentIntentAction) {
+        if (intent.action != intentAction) {
             return;
         }
 

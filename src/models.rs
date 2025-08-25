@@ -15,9 +15,9 @@ pub struct PingResponse {
 #[derive(Debug, Clone, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct DataWedgeData {
-    pub barcode: String,
-    pub timestamp: Option<String>,
-    pub symbology: Option<String>,
+    pub label_type: String,
+    pub data: Option<String>,
+    pub source: Option<String>,
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
