@@ -39,9 +39,6 @@ pub fn init<R: Runtime>() -> TauriPlugin<R> {
         .setup(|app, api| {
             #[cfg(mobile)]
             let dwrecv = mobile::init(app, api)?;
-            #[cfg(target_os = "android")]
-            let handle =
-                api.register_android_plugin("com.benditorok.dwrecv", "DWIntentReciever")?;
             #[cfg(desktop)]
             let dwrecv = desktop::init(app, api)?;
             app.manage(dwrecv);

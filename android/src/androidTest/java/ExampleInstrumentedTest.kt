@@ -22,10 +22,10 @@ class ExampleInstrumentedTest {
         assertEquals("com.benditorok.dwrecv", appContext.packageName)
 
         // Send intent
-        val intent = Intent(appContext, DWIntentReciever::class.java)
-        intent.putExtra("com.symbol.datawedge.data_string", "test_barcode")
-        intent.putExtra("com.symbol.datawedge.timestamp", System.currentTimeMillis())
+        val intent = Intent(appContext, DWIntentRecieverPlugin::class.java)
         intent.putExtra("com.symbol.datawedge.label_type", "QR_CODE")
+        intent.putExtra("com.symbol.datawedge.data_string", "test_barcode")
+        intent.putExtra("com.symbol.datawedge.source", "QR_CODE")
         appContext.sendBroadcast(intent)
 
         // Verify the result

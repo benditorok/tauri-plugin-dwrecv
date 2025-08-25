@@ -19,7 +19,7 @@ class PingArgs {
 }
 
 @TauriPlugin
-class DWIntentReciever(private val activity: Activity): Plugin(activity) {
+class DWIntentRecieverPlugin(private val activity: Activity): Plugin(activity) {
     // Default DataWedge intent action - can be customized
     private var currentIntentAction = "com.symbol.datawedge.api.RESULT_ACTION"
     private var currentIntentCategory = "android.intent.category.DEFAULT"
@@ -42,25 +42,25 @@ class DWIntentReciever(private val activity: Activity): Plugin(activity) {
             val bundle = intent.extras ?: return
             
             // Extract DataWedge data
-            val barcode = bundle.getString("com.symbol.datawedge.data_string") ?: ""
-            val timestamp = bundle.getString("com.symbol.datawedge.timestamp")
-            val symbology = bundle.getString("com.symbol.datawedge.label_type")
-            
+            val barcodeLabelType = bundle.getString("com.symbol.datawedge.label_type") ?: ""
+            val barcodeData = bundle.getString("com.symbol.datawedge.data_string") ?: ""
+            val barcodeSource = bundle.getString("com.symbol.datawedge.source") ?: ""
+
             // Create data object to send to frontend
             val dataWedgeData = JSObject().apply {
-                put("barcode", barcode)
-                put("timestamp", timestamp)
-                put("symbology", symbology)
+                put("labelType", barcodeLabelType)
+                put("data", barcodeData)
+                put("source", barcodeSource)
             }
             
             // Emit event to frontend
             trigger("dw-scan", dataWedgeData)
         } catch (e: Exception) {
-            // Log error or handle silently
-            val errorData = JSObject().apply {
-                put("error", "Failed to process DataWedge intent: ${e.message}")
+            // Handle errors
+            val dataWedgeError = JSObject().apply {
+                put("errorMessage", "Failed to process DataWedge intent: ${e.message}")
             }
-            trigger("dw-error", errorData)
+            trigger("dw-error", dataWedgeError)
         }
     }
 }

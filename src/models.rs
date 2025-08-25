@@ -19,3 +19,9 @@ pub struct DataWedgeData {
     pub timestamp: Option<String>,
     pub symbology: Option<String>,
 }
+
+#[derive(Debug, Clone, Deserialize, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct DataWedgeError {
+    pub error_message: String,
+}

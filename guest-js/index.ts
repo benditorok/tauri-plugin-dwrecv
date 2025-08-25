@@ -1,5 +1,4 @@
 import { invoke } from '@tauri-apps/api/core'
-import { listen, UnlistenFn } from '@tauri-apps/api/event'
 
 export interface DataWedgeData {
   barcode: string;
