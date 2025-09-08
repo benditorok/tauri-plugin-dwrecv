@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.Bundle
+import android.webkit.WebView
 import app.tauri.annotation.Command
 import app.tauri.annotation.InvokeArg
 import app.tauri.annotation.TauriPlugin
@@ -26,7 +27,7 @@ class Config {
  * DW intent receiver plugin
  */
 @TauriPlugin
-class DWIntentReceieverPlugin(private val activity: Activity): Plugin(activity) {
+class DWIntentReceiverPlugin(private val activity: Activity): Plugin(activity) {
     private var pingValue = "pong"
     private var intentAction = "com.symbol.datawedge.api.RESULT_ACTION"
 

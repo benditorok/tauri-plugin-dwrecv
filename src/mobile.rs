@@ -15,7 +15,7 @@ pub fn init<R: Runtime, C: DeserializeOwned>(
     api: PluginApi<R, C>,
 ) -> crate::Result<Dwrecv<R>> {
     #[cfg(target_os = "android")]
-    let handle = api.register_android_plugin("com.benditorok.dwrecv", "DWIntentReceieverPlugin")?;
+    let handle = api.register_android_plugin("com.benditorok.dwrecv", "DWIntentReceiverPlugin")?;
     #[cfg(target_os = "ios")]
     let handle = api.register_ios_plugin(init_plugin_dwrecv)?;
     Ok(Dwrecv(handle))
