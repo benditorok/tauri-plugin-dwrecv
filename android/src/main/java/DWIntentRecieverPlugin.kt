@@ -19,7 +19,7 @@ import app.tauri.plugin.Invoke
  */
 @InvokeArg
 class Config {
-    var pingvalue: String? = "pong"
+    var pingValue: String? = "pong"
     var intentAction: String? = "com.symbol.datawedge.api.RESULT_ACTION"
 }
 
