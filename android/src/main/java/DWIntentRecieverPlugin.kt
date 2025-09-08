@@ -32,9 +32,10 @@ class DWIntentReceiverPlugin(private val activity: Activity): Plugin(activity) {
     private var intentAction = "com.symbol.datawedge.api.RESULT_ACTION"
 
     override fun load(webView: WebView) {
-        getConfig(Config::class.java).let {
-            this.pingValue = it.pingvalue ?: this.pingValue
-            this.intentAction = it.intentAction ?: this.intentAction
+        val config = getConfig(Config::class.java)
+        if (config != null) {
+            this.pingValue = config.pingvalue ?: this.pingValue
+            this.intentAction = config.intentAction ?: this.intentAction
         }
     }
 
