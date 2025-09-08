@@ -34,7 +34,7 @@ class DWIntentReceiverPlugin(private val activity: Activity): Plugin(activity) {
     override fun load(webView: WebView) {
         val config = getConfig(Config::class.java)
         if (config != null) {
-            this.pingValue = config.pingvalue ?: this.pingValue
+            this.pingValue = config.pingValue ?: this.pingValue
             this.intentAction = config.intentAction ?: this.intentAction
         }
     }
