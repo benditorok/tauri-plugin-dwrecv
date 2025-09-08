@@ -26,7 +26,7 @@ class Config {
  * DW intent receiver plugin
  */
 @TauriPlugin
-class DWIntentRecieverPlugin(private val activity: Activity): Plugin(activity) {
+class DWIntentReceieverPlugin(private val activity: Activity): Plugin(activity) {
     private var pingValue = "pong"
     private var intentAction = "com.symbol.datawedge.api.RESULT_ACTION"
 
