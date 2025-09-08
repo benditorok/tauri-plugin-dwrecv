@@ -10,9 +10,9 @@ use crate::models::*;
 tauri::ios_plugin_binding!(init_plugin_dwrecv);
 
 // initializes the Kotlin or Swift plugin classes
-pub fn init<R: Runtime, C: DeserializeOwned>(
+pub fn init<R: Runtime>(
     _app: &AppHandle<R>,
-    api: PluginApi<R, C>,
+    api: PluginApi<R, PluginConfig>,
 ) -> crate::Result<Dwrecv<R>> {
     #[cfg(target_os = "android")]
     let handle = api.register_android_plugin("com.benditorok.dwrecv", "DWIntentReceiverPlugin")?;

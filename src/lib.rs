@@ -33,8 +33,8 @@ impl<R: Runtime, T: Manager<R>> crate::DwrecvExt<R> for T {
 }
 
 /// Initializes the plugin.
-pub fn init<R: Runtime>() -> TauriPlugin<R> {
-    Builder::new("dwrecv")
+pub fn init<R: Runtime>() -> TauriPlugin<R, models::PluginConfig> {
+    Builder::<R, models::PluginConfig>::new("dwrecv")
         .invoke_handler(tauri::generate_handler![commands::ping,])
         .setup(|app, api| {
             #[cfg(mobile)]
