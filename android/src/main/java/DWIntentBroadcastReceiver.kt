@@ -16,15 +16,15 @@ class DWIntentBroadcastReceiver(
     }
 
     override fun onReceive(context: Context, intent: Intent) {
-        Log.d(TAG, "Received intent: ${intent.action}")
+        Log.i(TAG, "Received intent: ${intent.action}")
 
         if (intent.action != intentAction) {
-            Log.d(TAG, "Ignoring intent: ${intent.action} doesn't match expected $intentAction")
+            Log.i(TAG, "Ignoring intent: ${intent.action} doesn't match expected $intentAction")
             return
         }
 
         try {
-            Log.d(TAG, "Processing intent: $intent")
+            Log.i(TAG, "Processing intent: $intent")
             val bundle = intent.extras
             if (bundle == null) {
                 Log.w(TAG, "No extras found in intent")
@@ -41,7 +41,7 @@ class DWIntentBroadcastReceiver(
                         put("data", barcodeData)
                         put("source", barcodeSource)
                     }
-            Log.d(TAG, "Triggering event 'dw-scan' with data: $dataWedgeData")
+            Log.i(TAG, "Triggering event 'dw-scan' with data: $dataWedgeData")
             trigger("dw-scan", dataWedgeData)
         } catch (e: Exception) {
             Log.e(TAG, "Error processing intent", e)
