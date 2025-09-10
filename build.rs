@@ -1,8 +1,9 @@
-const COMMANDS: &[&str] = &["ping"];
+// https://github.com/tauri-apps/tauri/issues/13027
+const COMMANDS: &[&str] = &["ping", "registerListener"];
 
 fn main() {
-  tauri_plugin::Builder::new(COMMANDS)
-    .android_path("android")
-    .ios_path("ios")
-    .build();
+    tauri_plugin::Builder::new(COMMANDS)
+        .android_path("android")
+        .ios_path("ios")
+        .build();
 }
