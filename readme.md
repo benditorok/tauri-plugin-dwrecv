@@ -27,3 +27,9 @@ cd src-tauri/gen/android/
   --es 'com.symbol.datawedge.label_type' 'EAN13' `
   --es 'com.symbol.datawedge.data_string' '1234567890123' `
   --es 'com.symbol.datawedge.source' 'scanner'
+
+adb shell am broadcast \
+  -a com.symbol.datawedge.api.RESULT_ACTION \
+  --es 'com.symbol.datawedge.label_type' 'EAN13' \
+  --es 'com.symbol.datawedge.data_string' '1234567890123' \
+  --es 'com.symbol.datawedge.source' 'scanner'
