@@ -8,7 +8,7 @@ import app.tauri.plugin.JSObject
 
 class DWIntentBroadcastReceiver(
         private val intentAction: String,
-        private val trigger: (event: String, data: JSObject) -> Unit
+        private val onDataReceived: (data: JSObject) -> Unit,
 ) : BroadcastReceiver() {
 
     companion object {
@@ -41,15 +41,15 @@ class DWIntentBroadcastReceiver(
                         put("data", barcodeData)
                         put("source", barcodeSource)
                     }
-            Log.i(TAG, "Triggering event 'dw-scan' with data: $dataWedgeData")
-            trigger("dw-scan", dataWedgeData)
+            Log.i(TAG, "Calling onDataReceived with data: $dataWedgeData")
+            onDataReceived(dataWedgeData)
         } catch (e: Exception) {
             Log.e(TAG, "Error processing intent", e)
             val dataWedgeError =
                     JSObject().apply {
                         put("errorMessage", "Failed to process DataWedge intent: ${e.message}")
                     }
-            trigger("dw-error", dataWedgeError)
+            onDataReceived(dataWedgeError)
         }
     }
 }

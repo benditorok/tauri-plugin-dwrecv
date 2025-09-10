@@ -54,9 +54,9 @@ class DWIntentReceiverPlugin(private val activity: Activity) : Plugin(activity) 
 
         // Use the separate BroadcastReceiver class and provide a lambda to trigger events
         receiver =
-                DWIntentBroadcastReceiver(intentAction) { event, data ->
-                    Log.i(TAG, "Triggering event: $event")
-                    trigger(event, data)
+                DWIntentBroadcastReceiver(intentAction) { data ->
+                    Log.i(TAG, "Triggering event: dw-scan")
+                    trigger("dw-scan", data)
                 }
 
         try {
