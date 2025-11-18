@@ -1,13 +1,17 @@
-import { invoke } from '@tauri-apps/api/core'
+import { invoke } from "@tauri-apps/api/core";
 
 export interface DataWedgeData {
-  barcode: string;
-  timestamp?: string;
-  symbology?: string;
+  label_type: string;
+  data: string;
+  source: string;
+}
+
+export interface DataWedgeError {
+  error_message: string;
 }
 
 export async function ping(value: string): Promise<string | null> {
-  return await invoke<{ value?: string }>('plugin:dwrecv|ping', {
+  return await invoke<{ value?: string }>("plugin:dwrecv|ping", {
     payload: {
       value,
     },
