@@ -21,7 +21,24 @@ Receive and parse Zebra DataWedge barcodes as broadcasted intents on Android.
 
 ## Usage
 
-Enable `dwrecv:default` in [`capabilities.json`].
+Enable `dwrecv:default` in [`capabilities > mobile.json`].
+
+```json
+{
+    "$schema": "../gen/schemas/mobile-schema.json",
+    "identifier": "mobile-capability",
+    "description": "Extra capability for the main window on mobile devices",
+    "windows": [
+        "main"
+    ],
+    "platforms": [
+        "android"
+    ],
+    "permissions": [
+        "dwrecv:default"
+    ]
+}
+```
 
 ### Blazor
 
@@ -33,11 +50,16 @@ Create a new javascript file with a function name which will be defined in Blazo
 const { addPluginListener } = window.__TAURI__.core;
 
 window.registerScanListeners = async function (dotnetRef) {
+  try {
     await addPluginListener(
         'dwrecv',
         'dw-scan',
         (payload) => dotnetRef.invokeMethodAsync('OnScanReceived', payload)
     );
+    console.log("Handle registered successfully")
+  } catch (e) {
+    console.error("Failed to register handle: {e}", e)
+  }
 };
 ```
 
@@ -58,20 +80,27 @@ Define the function calls in Blazor.
 ```cs
 @code {
     private class Barcode {
-        [JsonPropertyName("data")] public string? Data { get; set; }
-        [JsonPropertyName("labelType")] public string? LabelType { get; set; }
-        [JsonPropertyName("source")] public string? Source { get; set; }
+        [JsonPropertyName("data")] public string Data { get; set; }
+        [JsonPropertyName("labelType")] public string LabelType { get; set; }
+        [JsonPropertyName("source")] public string Source { get; set; }
+    }
+    
+    private class ScanError
+    {
+        [JsonPropertyName("errorMessage")] public string ErrorMessage { get; set; }
     }
     
     protected override async Task OnInitializedAsync()
     {
-        _ = await JSRuntime.InvokeAsync("registerScanListeners", DotNetObjectReference.Create(this))
+        await JSRuntime.InvokeVoidAsync("registerScanListeners", DotNetObjectReference.Create(this));
     }
     
     [JSInvokable]
-    public Task OnScanReceived(JsonObject message)
+    public Task OnScanReceived(JsonElement payload)
     {
-        var barcode = JsonSerializer.Deserialize<Barcode>();
+        var barcode = JsonSerializer.Deserialize<Barcode>(payload.GetRawText());
+        var error = JsonSerializer.Deserialize<DwScanError>(payload.GetRawText());
+        Logger.LogInformation("Barcode received: {Barcode}", barcode.Data);
         // ...
     }
 }
