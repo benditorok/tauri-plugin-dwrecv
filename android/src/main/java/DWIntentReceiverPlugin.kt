@@ -54,16 +54,16 @@ class DWIntentReceiverPlugin(private val activity: Activity) : Plugin(activity) 
 
         // Use the separate BroadcastReceiver class and provide a lambda to trigger events
         receiver =
-                DWIntentBroadcastReceiver(intentAction) { data ->
-                    Log.i(TAG, "Triggering event: dw-scan")
-                    trigger("dw-scan", data)
-                }
+            DWIntentBroadcastReceiver(intentAction) { data ->
+                Log.i(TAG, "Triggering event: dw-scan")
+                trigger("dw-scan", data)
+            }
 
         try {
             activity.registerReceiver(
-                    receiver,
-                    IntentFilter(intentAction),
-                    android.content.Context.RECEIVER_EXPORTED
+                receiver,
+                IntentFilter(intentAction),
+                android.content.Context.RECEIVER_EXPORTED
             )
             Log.i(TAG, "Successfully registered receiver for action: $intentAction")
         } catch (e: Exception) {
@@ -95,9 +95,9 @@ class DWIntentReceiverPlugin(private val activity: Activity) : Plugin(activity) 
         receiver?.let {
             try {
                 activity.registerReceiver(
-                        it,
-                        IntentFilter(intentAction),
-                        android.content.Context.RECEIVER_EXPORTED
+                    it,
+                    IntentFilter(intentAction),
+                    android.content.Context.RECEIVER_EXPORTED
                 )
                 Log.i(TAG, "Re-registered receiver for action: $intentAction")
             } catch (e: Exception) {
