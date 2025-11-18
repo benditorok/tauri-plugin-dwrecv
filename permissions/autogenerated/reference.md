@@ -5,7 +5,7 @@ Default permissions for the plugin
 #### This default permission set includes the following:
 
 - `allow-ping`
-- `allow-registerListener`
+- `allow-register-listener`
 
 ## Permission Table
 
@@ -45,12 +45,12 @@ Denies the ping command without any pre-configured scope.
 <tr>
 <td>
 
-`dwrecv:allow-registerListener`
+`dwrecv:allow-register-listener`
 
 </td>
 <td>
 
-Enables the registerListener command without any pre-configured scope.
+Enables the register-listener command without any pre-configured scope.
 
 </td>
 </tr>
@@ -58,12 +58,12 @@ Enables the registerListener command without any pre-configured scope.
 <tr>
 <td>
 
-`dwrecv:deny-registerListener`
+`dwrecv:deny-register-listener`
 
 </td>
 <td>
 
-Denies the registerListener command without any pre-configured scope.
+Denies the register-listener command without any pre-configured scope.
 
 </td>
 </tr>
