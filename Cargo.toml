@@ -1,6 +1,6 @@
 [package]
 name = "tauri-plugin-dwrecv"
-version = "0.2.0"
+version = "0.3.0"
 authors = ["benditorok"]
 description = "Handle Zebra DataWedge broadcast intents to receive and parse barcode data on Android."
 edition = "2021"
