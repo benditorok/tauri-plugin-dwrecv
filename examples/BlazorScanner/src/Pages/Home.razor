@@ -25,7 +25,7 @@
 
     @if (BarcodeContent is not null)
     {
-        <div style="display: flex; align-items: center; justify-content: center;">
+        <div style="display: flex; align-items: center; justify-content: center; background-color: oklch(81% 0.117 11.638);">
             <p>@BarcodeContent</p>
         </div>
     }
@@ -45,19 +45,20 @@
     }
 
     [JSInvokable]
-    public Task OnScanReceived(JsonElement payload)
+    public async Task OnScanReceived(JsonElement payload)
     {
         var barcode = JsonSerializer.Deserialize<Barcode>(payload.GetRawText());
         _ = JsonSerializer.Deserialize<ScanError>(payload.GetRawText());
         BarcodeContent = barcode?.Data;
 
+        await InvokeAsync(StateHasChanged);
+
         _ = Task.Run(async () =>
         {
             await Task.Delay(2000);
             BarcodeContent = null;
+            await InvokeAsync(StateHasChanged);
         });
-
-        return Task.CompletedTask;
     }
 
     private async Task GreetAsync()
