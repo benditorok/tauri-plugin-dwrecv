@@ -5,7 +5,7 @@ Receive and parse Zebra DataWedge barcodes as broadcasted intents on Android.
 ## Usage
 
 - Create a new project: [Tauri Guide](https://tauri.app/start/).
-- Enable `dwrecv:default` in [`capabilities > mobile.json`].
+- Enable `dwrecv:default` in [`capabilities/mobile.json`].
 
 ```json
 {
@@ -56,9 +56,7 @@ pub fn run() {
 
 ### Blazor
 
-Create a new javascript file with a function name which will be defined in Blazor like `OnScanReceived`.
-
-[`tauriEvents.js`]
+Create a new javascript file [`tauriEvents.js`] with a function name which will be defined in Blazor like `OnScanReceived`.
 
 ```js
 const { addPluginListener } = window.__TAURI__.core;
@@ -77,9 +75,7 @@ window.registerScanListeners = async function (dotnetRef) {
 };
 ```
 
-Include it in index.html.
-
-[`wwwroot\index.html`]
+Include it in [`wwwroot\index.html`].
 
 ```html
 <!-- -->
