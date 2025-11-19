@@ -56,7 +56,7 @@ pub fn run() {
 
 ### Blazor
 
-Create a new javascript file [`tauriEvents.js`] with a function name which will be defined in Blazor like `OnScanReceived`.
+- Create a new javascript file [`tauriEvents.js`] with a function name which will be defined in Blazor like `OnScanReceived`.
 
 ```js
 const { addPluginListener } = window.__TAURI__.core;
@@ -75,7 +75,7 @@ window.registerScanListeners = async function (dotnetRef) {
 };
 ```
 
-Include it in [`wwwroot\index.html`].
+- Include it in [`wwwroot\index.html`].
 
 ```html
 <!-- -->
@@ -85,11 +85,12 @@ Include it in [`wwwroot\index.html`].
 <!-- -->
 ```
 
-Define the function calls in Blazor.
+- Define the function calls in Blazor.
 
 ```cs
 @code {
-    private class Barcode {
+    private class Barcode
+    {
         [JsonPropertyName("data")] public string Data { get; set; }
         [JsonPropertyName("labelType")] public string LabelType { get; set; }
         [JsonPropertyName("source")] public string Source { get; set; }
@@ -111,14 +112,13 @@ Define the function calls in Blazor.
         var barcode = JsonSerializer.Deserialize<Barcode>(payload.GetRawText());
         var error = JsonSerializer.Deserialize<ScanError>(payload.GetRawText());
         Logger.LogInformation("Barcode received: {Barcode}", barcode.Data);
-        // ...
     }
 }
 ```
 
 ## Testing
 
-You can send intents ujsing `adb` to your device. 
+You can send intents using `adb` to your device. 
 
 - Windows:
 
@@ -148,7 +148,7 @@ $ adb shell am broadcast \
   --es 'com.symbol.datawedge.source' 'test-scanner'
 ```
 
-## Plugin development
+## Plugin development information
   
 ### Show Kotlin compilation errors
 
