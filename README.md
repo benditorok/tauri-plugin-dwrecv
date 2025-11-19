@@ -1,10 +1,34 @@
 # tauri-plugin-dwrecv
 
-Receive and parse Zebra DataWedge barcodes as broadcasted intents on Android.
+Handle Zebra DataWedge broadcast intents to receive and parse barcode data on Android.
 
 ## Usage
 
 - Create a new project: [Tauri Guide](https://tauri.app/start/).
+- Add `tauri-plugin-dwrecv` to your project's [`src-tauri/Cargo.toml`].
+
+```json
+[dependencies]
+# ...
+tauri-plugin-dwrecv = { git = "https://github.com/benditorok/tauri-plugin-dwrecv.git", tag = "dwrecv-v0.1.0" }
+```
+
+- Configure [`src-tauri/tauri.conf.json`].
+
+```json
+{
+  "build": {},
+  "app": {},
+  "bundle": {},
+  "plugins": {
+    "dwrecv": {
+      "pingValue": "ping",
+      "intentAction": "com.your.intentName"
+    }
+  }
+}
+```
+
 - Enable `dwrecv:default` in [`src-tauri/capabilities/mobile.json`].
 
 ```json
@@ -21,22 +45,6 @@ Receive and parse Zebra DataWedge barcodes as broadcasted intents on Android.
     "permissions": [
         "dwrecv:default"
     ]
-}
-```
-
-- Configure [`src-tauri/tauri.conf.json`].
-
-```json
-{
-  "build": {},
-  "app": {},
-  "bundle": {},
-  "plugins": {
-    "dwrecv": {
-      "pingValue": "ping",
-      "intentAction": "com.your.intentName"
-    }
-  }
 }
 ```
 

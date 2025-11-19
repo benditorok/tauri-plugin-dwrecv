@@ -2,7 +2,7 @@
 name = "tauri-plugin-dwrecv"
 version = "0.1.0"
 authors = ["benditorok"]
-description = ""
+description = "Handle Zebra DataWedge broadcast intents to receive and parse barcode data on Android."
 edition = "2021"
 rust-version = "1.77.2"
 exclude = ["/examples", "/dist-js", "/guest-js", "/node_modules"]
