@@ -7,7 +7,7 @@ Handle Zebra DataWedge broadcast intents to receive and parse barcode data on An
 - Create a new project: [Tauri Guide](https://tauri.app/start/).
 - Add `tauri-plugin-dwrecv` to your project's [`src-tauri/Cargo.toml`].
 
-```json
+```toml
 [dependencies]
 tauri-plugin-dwrecv = { git = "https://github.com/benditorok/tauri-plugin-dwrecv.git", tag = "dwrecv-v0.1.0" }
 ```
