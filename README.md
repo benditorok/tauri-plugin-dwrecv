@@ -5,7 +5,7 @@ Receive and parse Zebra DataWedge barcodes as broadcasted intents on Android.
 ## Usage
 
 - Create a new project: [Tauri Guide](https://tauri.app/start/).
-- Enable `dwrecv:default` in [`capabilities/mobile.json`].
+- Enable `dwrecv:default` in [`src-tauri/capabilities/mobile.json`].
 
 ```json
 {
@@ -24,7 +24,7 @@ Receive and parse Zebra DataWedge barcodes as broadcasted intents on Android.
 }
 ```
 
-- Configure [`tauri.conf.json`].
+- Configure [`src-tauri/tauri.conf.json`].
 
 ```json
 {
@@ -40,7 +40,7 @@ Receive and parse Zebra DataWedge barcodes as broadcasted intents on Android.
 }
 ```
 
-- Initialize the plugin.
+- Initialize the plugin in [`src-tauri/src/lib.rs`].
 
 ```rust
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -56,7 +56,7 @@ pub fn run() {
 
 ### Blazor
 
-- Create a new javascript file [`tauriEvents.js`] with a function name which will be defined in Blazor like `OnScanReceived`.
+- Create a new javascript file [`src/wwwroot/scripts/tauriEvents.js`] with a function name which will be defined in Blazor like `OnScanReceived`.
 
 ```js
 const { addPluginListener } = window.__TAURI__.core;
@@ -75,7 +75,7 @@ window.registerScanListeners = async function (dotnetRef) {
 };
 ```
 
-- Include it in [`wwwroot\index.html`].
+- Include it in [`src/wwwroot/index.html`].
 
 ```html
 <!-- -->
@@ -118,7 +118,7 @@ window.registerScanListeners = async function (dotnetRef) {
 
 ## Testing
 
-You can send intents using `adb` to your device. 
+You can send intents using `adb` to your device. Make sure your device is connected with `adb devices`.
 
 - Windows:
 
