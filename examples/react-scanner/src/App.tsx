@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import reactLogo from "./assets/react.svg";
 import { invoke } from "@tauri-apps/api/core";
-import { addPluginListener } from "@tauri-apps/api/core";
+import { addPluginListener, type PluginListener } from "@tauri-apps/api/core";
 import "./App.css";
 
 interface Barcode {
@@ -22,7 +22,7 @@ function App() {
   const [barcodeContent, setBarcodeContent] = useState<string | null>(null);
 
   useEffect(() => {
-    let unlisten: (() => void) | undefined;
+    let unlisten: PluginListener | undefined;
 
     const setupListener = async () => {
       try {
@@ -48,7 +48,7 @@ function App() {
 
     return () => {
       if (unlisten) {
-        unlisten();
+        unlisten.unregister();
       }
     };
   }, []);

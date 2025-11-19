@@ -6,6 +6,7 @@ Default permissions for the plugin
 
 - `allow-ping`
 - `allow-register-listener`
+- `allow-unregister-listener`
 
 ## Permission Table
 
@@ -64,6 +65,32 @@ Enables the register_listener command without any pre-configured scope.
 <td>
 
 Denies the register_listener command without any pre-configured scope.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
+`dwrecv:allow-unregister-listener`
+
+</td>
+<td>
+
+Enables the unregister_listener command without any pre-configured scope.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
+`dwrecv:deny-unregister-listener`
+
+</td>
+<td>
+
+Denies the unregister_listener command without any pre-configured scope.
 
 </td>
 </tr>

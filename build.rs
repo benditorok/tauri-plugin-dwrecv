@@ -6,7 +6,7 @@
 ///     * API changed in 2.9.x
 ///     * https://github.com/tauri-apps/tauri/issues/13027#issuecomment-3457217759
 ///     * https://github.com/tauri-apps/tauri/pull/14132
-const COMMANDS: &[&str] = &["ping", "register_listener"];
+const COMMANDS: &[&str] = &["ping", "register_listener", "unregister_listener"];
 
 fn main() {
     tauri_plugin::Builder::new(COMMANDS)
