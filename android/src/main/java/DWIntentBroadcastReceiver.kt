@@ -7,8 +7,8 @@ import android.util.Log
 import app.tauri.plugin.JSObject
 
 class DWIntentBroadcastReceiver(
-        private val intentAction: String,
-        private val onDataReceived: (data: JSObject) -> Unit,
+    private val intentAction: String,
+    private val onDataReceived: (data: JSObject) -> Unit,
 ) : BroadcastReceiver() {
 
     companion object {
@@ -36,19 +36,19 @@ class DWIntentBroadcastReceiver(
             val barcodeSource = bundle.getString("com.symbol.datawedge.source") ?: ""
 
             val dataWedgeData =
-                    JSObject().apply {
-                        put("labelType", barcodeLabelType)
-                        put("data", barcodeData)
-                        put("source", barcodeSource)
-                    }
+                JSObject().apply {
+                    put("labelType", barcodeLabelType)
+                    put("data", barcodeData)
+                    put("source", barcodeSource)
+                }
             Log.i(TAG, "Calling onDataReceived with data: $dataWedgeData")
             onDataReceived(dataWedgeData)
         } catch (e: Exception) {
             Log.e(TAG, "Error processing intent", e)
             val dataWedgeError =
-                    JSObject().apply {
-                        put("errorMessage", "Failed to process DataWedge intent: ${e.message}")
-                    }
+                JSObject().apply {
+                    put("errorMessage", "Failed to process DataWedge intent: ${e.message}")
+                }
             onDataReceived(dataWedgeError)
         }
     }

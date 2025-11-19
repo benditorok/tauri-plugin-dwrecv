@@ -18,6 +18,7 @@ import app.tauri.plugin.Plugin
 class Config {
     var pingValue: String? = "pong"
     var intentAction: String? = "com.symbol.datawedge.api.RESULT_ACTION"
+    var intentCategory: String? = null
 }
 
 /*
@@ -27,6 +28,7 @@ class Config {
 class DWIntentReceiverPlugin(private val activity: Activity) : Plugin(activity) {
     private var pingValue = "pong"
     private var intentAction = "com.symbol.datawedge.api.RESULT_ACTION"
+    private var intentCategory: String? = null
     private var receiver: DWIntentBroadcastReceiver? = null
 
     companion object {
@@ -40,13 +42,16 @@ class DWIntentReceiverPlugin(private val activity: Activity) : Plugin(activity) 
     }
 
     override fun load(webView: WebView) {
-        Log.i(TAG, "Loading plugin with intent action: $intentAction")
+        val categoryLog = intentCategory?.let { "category: $it" } ?: "no category"
+        Log.i(TAG, "Loading plugin with intent action: $intentAction, $categoryLog")
 
         // Load configuration if available
         getConfig(Config::class.java)?.let { config ->
             pingValue = config.pingValue ?: pingValue
             intentAction = config.intentAction ?: intentAction
-            Log.i(TAG, "Loaded config - intentAction: $intentAction, pingValue: $pingValue")
+            intentCategory = config.intentCategory
+            val configCategoryLog = intentCategory?.let { "intentCategory: $it" } ?: "intentCategory: none"
+            Log.i(TAG, "Loaded config - intentAction: $intentAction, $configCategoryLog, pingValue: $pingValue")
         }
 
         // Unregister existing receiver if any
@@ -60,12 +65,16 @@ class DWIntentReceiverPlugin(private val activity: Activity) : Plugin(activity) 
             }
 
         try {
+            val filter = IntentFilter(intentAction).apply {
+                intentCategory?.let { addCategory(it) }
+            }
             activity.registerReceiver(
                 receiver,
-                IntentFilter(intentAction),
+                filter,
                 android.content.Context.RECEIVER_EXPORTED
             )
-            Log.i(TAG, "Successfully registered receiver for action: $intentAction")
+            val regCategoryLog = intentCategory?.let { "category: $it" } ?: "no category"
+            Log.i(TAG, "Successfully registered receiver for action: $intentAction, $regCategoryLog")
         } catch (e: Exception) {
             Log.e(TAG, "Failed to register receiver", e)
         }
@@ -94,12 +103,16 @@ class DWIntentReceiverPlugin(private val activity: Activity) : Plugin(activity) 
         // Re-register receiver when app resumes
         receiver?.let {
             try {
+                val filter = IntentFilter(intentAction).apply {
+                    intentCategory?.let { addCategory(it) }
+                }
                 activity.registerReceiver(
                     it,
-                    IntentFilter(intentAction),
+                    filter,
                     android.content.Context.RECEIVER_EXPORTED
                 )
-                Log.i(TAG, "Re-registered receiver for action: $intentAction")
+                val resumeCategoryLog = intentCategory?.let { "category: $it" } ?: "no category"
+                Log.i(TAG, "Re-registered receiver for action: $intentAction, $resumeCategoryLog")
             } catch (e: Exception) {
                 Log.e(TAG, "Failed to re-register receiver", e)
             }

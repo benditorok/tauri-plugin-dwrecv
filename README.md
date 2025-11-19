@@ -14,6 +14,8 @@ tauri-plugin-dwrecv = { git = "https://github.com/benditorok/tauri-plugin-dwrecv
 
 - Configure [`src-tauri/tauri.conf.json`].
 
+  - `intentCategory` is optional.
+
 ```json
 {
   "build": {},
@@ -22,7 +24,8 @@ tauri-plugin-dwrecv = { git = "https://github.com/benditorok/tauri-plugin-dwrecv
   "plugins": {
     "dwrecv": {
       "pingValue": "ping",
-      "intentAction": "com.your.intentName"
+      "intentAction": "com.your.intentName",
+      "intentCategory": "android.intent.category.DEFAULT"
     }
   }
 }
@@ -136,28 +139,38 @@ window.registerScanListeners = async function (dotnetRef) {
 You can send intents using `adb` to your device. Make sure your device is connected with `adb devices`.
 
 - Windows:
-
+  - Check device logs:
+  
 ```powershell
 $ adb logcat | findstr DWIntent
 ```
 
+  - Broadcast intent:
+    - The `-c` switch is optional.
+
 ```ps
 $ adb shell am broadcast `
   -a com.your.intentName `
+  -c android.intent.category.DEFAULT `
   --es 'com.symbol.datawedge.label_type' 'CODE128' `
   --es 'com.symbol.datawedge.data_string' '1234567890123' `
   --es 'com.symbol.datawedge.source' 'test-scanner'
 ```
 
 - Linux: 
-
+  - Check device logs:
+  
 ```bash
 $ adb logcat | grep DWIntent
 ```
 
+  - Broadcast intent:
+    - The `-c` switch is optional.
+
 ```bash
 $ adb shell am broadcast \
   -a com.your.intentName \
+  -c android.intent.category.DEFAULT \
   --es 'com.symbol.datawedge.label_type' 'CODE128' \
   --es 'com.symbol.datawedge.data_string' '1234567890123' \
   --es 'com.symbol.datawedge.source' 'test-scanner'

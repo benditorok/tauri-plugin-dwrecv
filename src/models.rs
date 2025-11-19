@@ -5,6 +5,7 @@ use serde::{Deserialize, Serialize};
 pub struct PluginConfig {
     pub ping_value: Option<String>,
     pub intent_action: Option<String>,
+    pub intent_category: Option<String>,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
