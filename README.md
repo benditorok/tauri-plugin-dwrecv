@@ -75,14 +75,27 @@ const { addPluginListener } = window.__TAURI__.core;
 
 window.registerScanListeners = async function (dotnetRef) {
   try {
-    await addPluginListener(
+    const listener = await addPluginListener(
         'dwrecv',
         'dw-scan',
         (payload) => dotnetRef.invokeMethodAsync('OnScanReceived', payload)
     );
-    console.log("Handle registered successfully")
+    console.log("Handle registered successfully");
+    return listener;
   } catch (e) {
-    console.error("Failed to register handle: {e}", e)
+    console.error("Failed to register handle: {e}", e);
+    throw e;
+  }
+};
+
+window.unregisterScanListeners = async function (listener) {
+  try {
+    if (listener) {
+      await listener.unregister();
+      console.log("Handle unregistered successfully");
+    }
+  } catch (e) {
+    console.error("Failed to unregister handle: {e}", e);
   }
 };
 ```
@@ -100,6 +113,14 @@ window.registerScanListeners = async function (dotnetRef) {
 - Define the function calls in Blazor.
 
 ```cs
+@using System.Text.Json
+@using System.Text.Json.Serialization
+@implements IAsyncDisposable
+
+@page "/"
+
+<p>Check the console for barcode scan results.</p>
+
 @code {
     private class Barcode
     {
@@ -113,9 +134,24 @@ window.registerScanListeners = async function (dotnetRef) {
         [JsonPropertyName("errorMessage")] public string ErrorMessage { get; set; }
     }
     
+    private IJSObjectReference? _pluginListener;
+    private DotNetObjectReference<Home>? _dotNetRef;
+    
     protected override async Task OnInitializedAsync()
     {
-        await JsRuntime.InvokeVoidAsync("registerScanListeners", DotNetObjectReference.Create(this));
+        _dotNetRef = DotNetObjectReference.Create(this);
+        _pluginListener = await JsRuntime.InvokeAsync<IJSObjectReference>("registerScanListeners", _dotNetRef);
+    }
+    
+    public async ValueTask DisposeAsync()
+    {
+        if (_pluginListener is not null)
+        {
+            await JsRuntime.InvokeVoidAsync("unregisterScanListeners", _pluginListener);
+            await _pluginListener.DisposeAsync();
+        }
+        
+        _dotNetRef?.Dispose();
     }
     
     [JSInvokable]
@@ -128,11 +164,70 @@ window.registerScanListeners = async function (dotnetRef) {
 }
 ```
 
-### Other information
+#### Other information
 
 - Your dev URL *should* be set to http://0.0.0.0 instead of http://localhost in:
-  - [`src-tauri/tauri.conf.json`]: `"devUrl": "http://0.0.0.0:1420"`
   - [`src/Properties/launchSettings.json`]: `"applicationUrl": "http://0.0.0.0:1420"`
+
+### React
+
+You can find an example project under [`examples/react-scanner`].
+
+- Register the listener using `addPluginListener` and store it for cleanup.
+
+```tsx
+import { useState, useEffect } from "react";
+import { addPluginListener, type PluginListener } from "@tauri-apps/api/core";
+
+interface Barcode {
+  data: string;
+  labelType: string;
+  source: string;
+}
+
+interface ScanError {
+  errorMessage: string;
+}
+
+type ScanPayload = Barcode | ScanError;
+
+function App() {
+  useEffect(() => {
+    let unlisten: PluginListener | undefined;
+
+    const setupListener = async () => {
+      try {
+        unlisten = await addPluginListener("dwrecv", "dw-scan", (payload: ScanPayload) => {
+          if ("data" in payload) {
+            console.log("Barcode received:", payload.data);
+          } else if ("errorMessage" in payload) {
+            console.error("Scan error:", payload.errorMessage);
+          }
+        });
+        console.log("Scan listener registered successfully");
+      } catch (e) {
+        console.error("Failed to register scan listener:", e);
+      }
+    };
+
+    setupListener();
+
+    return () => {
+      if (unlisten) {
+        unlisten.unregister();
+      }
+    };
+  }, []);
+
+  return (
+    <main>
+      <p>Check the console for barcode scan results.</p>
+    </main>
+  );
+}
+
+export default App;
+```
 
 ## Testing
 
