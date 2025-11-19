@@ -56,6 +56,8 @@ pub fn run() {
 
 ### Blazor
 
+You can find an example project under [`examples/BlazorScanner`].
+
 - Create a new javascript file [`src/wwwroot/scripts/tauriEvents.js`] with a function name which will be defined in Blazor like `OnScanReceived`.
 
 ```js
@@ -115,6 +117,12 @@ window.registerScanListeners = async function (dotnetRef) {
     }
 }
 ```
+
+### Other information
+
+- Your dev URL *should* be set to http://0.0.0.0 instead of http://localhost in:
+  - [`src-tauri/tauri.conf.json`]: `"devUrl": "http://0.0.0.0:1420"`
+  - [`src/Properties/launchSettings.json`]: `"applicationUrl": "http://0.0.0.0:1420"`
 
 ## Testing
 
