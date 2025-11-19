@@ -5,7 +5,7 @@
   "identifier": "com.bendi.react-scanner",
   "build": {
     "beforeDevCommand": "deno task dev",
-    "devUrl": "http://0.0.0.0:1420",
+    "devUrl": "http://localhost:1420",
     "beforeBuildCommand": "deno task build",
     "frontendDist": "../dist"
   },
