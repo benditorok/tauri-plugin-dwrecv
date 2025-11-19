@@ -160,3 +160,7 @@ $ adb shell am broadcast \
 $ cd src-tauri/gen/android/
 $ ./gradlew compileDebugKotlin --scan
 ```
+
+# License 
+
+MIT
