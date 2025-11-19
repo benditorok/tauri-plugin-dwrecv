@@ -1,4 +1,7 @@
-﻿@page "/"
+@using System.Text.Json
+@using System.Text.Json.Serialization
+
+@page "/"
 @inject IJSRuntime JsRuntime
 
 <main class="container">
@@ -6,19 +9,26 @@
 
     <div class="row">
         <a href="https://tauri.app" target="_blank">
-            <img src="img/tauri.svg" class="logo tauri" alt="Tauri logo"/>
+            <img src="img/tauri.svg" class="logo tauri" alt="Tauri logo" />
         </a>
         <a href="https://dotnet.microsoft.com/en-us/apps/aspnet/web-apps/blazor" target="_blank">
-            <img src="img/blazor.svg" class="logo blazor" alt="Blazor logo"/>
+            <img src="img/blazor.svg" class="logo blazor" alt="Blazor logo" />
         </a>
     </div>
     <p>Click on the Tauri and Blazor logos to learn more.</p>
 
     <form class="row" @onsubmit="GreetAsync" @onsubmit:preventDefault="true">
-        <input id="greet-input" placeholder="Enter a name..." @bind="GreetInput"/>
+        <input id="greet-input" placeholder="Enter a name..." @bind="GreetInput" />
         <button type="submit">Greet</button>
     </form>
     <p>@GreetMsg</p>
+
+    @if (BarcodeContent is not null)
+    {
+        <div style="display: flex; align-items: center; justify-content: center;">
+            <p>@BarcodeContent</p>
+        </div>
+    }
 </main>
 
 @code
@@ -27,8 +37,43 @@
 
     private string? GreetMsg { get; set; }
 
+    private string? BarcodeContent { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await JsRuntime.InvokeVoidAsync("registerScanListeners", DotNetObjectReference.Create(this));
+    }
+
+    [JSInvokable]
+    public Task OnScanReceived(JsonElement payload)
+    {
+        var barcode = JsonSerializer.Deserialize<Barcode>(payload.GetRawText());
+        _ = JsonSerializer.Deserialize<ScanError>(payload.GetRawText());
+        BarcodeContent = barcode?.Data;
+
+        _ = Task.Run(async () =>
+        {
+            await Task.Delay(2000);
+            BarcodeContent = null;
+        });
+
+        return Task.CompletedTask;
+    }
+
     private async Task GreetAsync()
     {
         GreetMsg = await JsRuntime.InvokeAsync<string>("__TAURI__.core.invoke", "greet", new { name = GreetInput });
+    }
+
+    private class Barcode
+    {
+        [JsonPropertyName("data")] public string Data { get; set; } = string.Empty;
+        [JsonPropertyName("labelType")] public string LabelType { get; set; } = string.Empty;
+        [JsonPropertyName("source")] public string Source { get; set; } = string.Empty;
+    }
+
+    private class ScanError
+    {
+        [JsonPropertyName("errorMessage")] public string ErrorMessage { get; set; } = string.Empty;
     }
 }

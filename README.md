@@ -2,26 +2,10 @@
 
 Receive and parse Zebra DataWedge barcodes as broadcasted intents on Android.
 
-## Configuration
-
-[`tauri.conf.json`]
-
-```json
-{
-  "build": { ... },
-  "tauri": { ... },
-  "plugins": {
-    "dwrecv": {
-      "pingValue": "ping",
-      "intentAction": "com.your.intentName"
-    }
-  }
-}
-```
-
 ## Usage
 
-Enable `dwrecv:default` in [`capabilities > mobile.json`].
+- Create a new project: [Tauri Guide](https://tauri.app/start/).
+- Enable `dwrecv:default` in [`capabilities > mobile.json`].
 
 ```json
 {
@@ -37,6 +21,35 @@ Enable `dwrecv:default` in [`capabilities > mobile.json`].
     "permissions": [
         "dwrecv:default"
     ]
+}
+```
+
+- Configure [`tauri.conf.json`].
+
+```json
+{
+  "build": { ... },
+  "tauri": { ... },
+  "plugins": {
+    "dwrecv": {
+      "pingValue": "ping",
+      "intentAction": "com.your.intentName"
+    }
+  }
+}
+```
+
+- Initialize the plugin.
+
+```rust
+#[cfg_attr(mobile, tauri::mobile_entry_point)]
+pub fn run() {
+    tauri::Builder::default()
+        .plugin(tauri_plugin_opener::init())
+        .plugin(tauri_plugin_dwrecv::init()) // Add this line
+        .invoke_handler(tauri::generate_handler![greet])
+        .run(tauri::generate_context!())
+        .expect("error while running tauri application");
 }
 ```
 
@@ -92,14 +105,14 @@ Define the function calls in Blazor.
     
     protected override async Task OnInitializedAsync()
     {
-        await JSRuntime.InvokeVoidAsync("registerScanListeners", DotNetObjectReference.Create(this));
+        await JsRuntime.InvokeVoidAsync("registerScanListeners", DotNetObjectReference.Create(this));
     }
     
     [JSInvokable]
     public Task OnScanReceived(JsonElement payload)
     {
         var barcode = JsonSerializer.Deserialize<Barcode>(payload.GetRawText());
-        var error = JsonSerializer.Deserialize<DwScanError>(payload.GetRawText());
+        var error = JsonSerializer.Deserialize<ScanError>(payload.GetRawText());
         Logger.LogInformation("Barcode received: {Barcode}", barcode.Data);
         // ...
     }
@@ -126,7 +139,7 @@ $ adb shell am broadcast `
 
 - Linux: 
 
-```powershell
+```bash
 $ adb logcat | grep DWIntent
 ```
 
