@@ -1,5 +1,6 @@
 @using System.Text.Json
 @using System.Text.Json.Serialization
+@implements IAsyncDisposable
 
 @page "/"
 @inject IJSRuntime JsRuntime
@@ -39,9 +40,24 @@
 
     private string? BarcodeContent { get; set; }
 
+    private IJSObjectReference? _pluginListener;
+    private DotNetObjectReference<Home>? _dotNetRef;
+
     protected override async Task OnInitializedAsync()
     {
-        await JsRuntime.InvokeVoidAsync("registerScanListeners", DotNetObjectReference.Create(this));
+        _dotNetRef = DotNetObjectReference.Create(this);
+        _pluginListener = await JsRuntime.InvokeAsync<IJSObjectReference>("registerScanListeners", _dotNetRef);
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (_pluginListener is not null)
+        {
+            await JsRuntime.InvokeVoidAsync("unregisterScanListeners", _pluginListener);
+            await _pluginListener.DisposeAsync();
+        }
+
+        _dotNetRef?.Dispose();
     }
 
     [JSInvokable]

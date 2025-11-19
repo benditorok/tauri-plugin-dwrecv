@@ -5,7 +5,7 @@
   "identifier": "com.bendi.blazorscanner",
   "build": {
     "beforeDevCommand": "dotnet watch run --project src/BlazorScanner.csproj",
-    "devUrl": "http://0.0.0.0:1420",
+    "devUrl": "http://localhost:1420",
     "beforeBuildCommand": "dotnet publish -c release src/BlazorScanner.csproj -o dist",
     "frontendDist": "../dist/wwwroot"
   },
