@@ -50,7 +50,7 @@ Denies the ping command without any pre-configured scope.
 </td>
 <td>
 
-Enables the register-listener command without any pre-configured scope.
+Enables the register_listener command without any pre-configured scope.
 
 </td>
 </tr>
@@ -63,7 +63,7 @@ Enables the register-listener command without any pre-configured scope.
 </td>
 <td>
 
-Denies the register-listener command without any pre-configured scope.
+Denies the register_listener command without any pre-configured scope.
 
 </td>
 </tr>

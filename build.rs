@@ -6,7 +6,7 @@
 ///
 /// RegisterListener
 /// * Source: https://github.com/tauri-apps/tauri/blob/dev/packages/api/src/core.ts#L189
-const COMMANDS: &[&str] = &["ping", "register-listener"];
+const COMMANDS: &[&str] = &["ping", "register_listener"];
 
 fn main() {
     tauri_plugin::Builder::new(COMMANDS)
