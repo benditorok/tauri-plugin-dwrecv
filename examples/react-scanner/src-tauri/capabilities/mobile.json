@@ -1,0 +1,8 @@
+{
+  "$schema": "../gen/schemas/mobile-schema.json",
+  "identifier": "mobile-capability",
+  "description": "Extra capability for the main window on mobile devices",
+  "windows": ["main"],
+  "platforms": ["android"],
+  "permissions": ["dwrecv:default"]
+}
