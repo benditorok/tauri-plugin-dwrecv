@@ -11,7 +11,7 @@ Receive and parse Zebra DataWedge barcodes as broadcasted intents on Android.
   "build": { ... },
   "tauri": { ... },
   "plugins": {
-    "tauri-plugin-dwrecv": {
+    "dwrecv": {
       "pingValue": "ping",
       "intentAction": "com.your.intentName"
     }
