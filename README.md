@@ -28,8 +28,9 @@ Receive and parse Zebra DataWedge barcodes as broadcasted intents on Android.
 
 ```json
 {
-  "build": { ... },
-  "tauri": { ... },
+  "build": {},
+  "app": {},
+  "bundle": {},
   "plugins": {
     "dwrecv": {
       "pingValue": "ping",
