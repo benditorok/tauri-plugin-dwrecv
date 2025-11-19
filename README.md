@@ -138,15 +138,24 @@ window.registerScanListeners = async function (dotnetRef) {
 
 You can send intents using `adb` to your device. Make sure your device is connected with `adb devices`.
 
+
+### Check device logs:
+
 - Windows:
-  - Check device logs:
   
 ```powershell
 $ adb logcat | findstr DWIntent
 ```
+- Linux: 
+  
+```bash
+$ adb logcat | grep DWIntent
+```
+  
+### Broadcast intents:
 
-  - Broadcast intent:
-    - The `-c` switch is optional.
+- The `-c` switch is optional.
+- Windows:
 
 ```ps
 $ adb shell am broadcast `
@@ -158,14 +167,6 @@ $ adb shell am broadcast `
 ```
 
 - Linux: 
-  - Check device logs:
-  
-```bash
-$ adb logcat | grep DWIntent
-```
-
-  - Broadcast intent:
-    - The `-c` switch is optional.
 
 ```bash
 $ adb shell am broadcast \
