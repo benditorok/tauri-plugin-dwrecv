@@ -9,7 +9,7 @@ window.registerScanListeners = async function (dotnetRef) {
     return listener;
   } catch (e) {
     console.error("Failed to register handle: {e}", e);
-    throw e;
+    return null;
   }
 };
 
