@@ -4,6 +4,7 @@
 
 @page "/"
 @inject IJSRuntime JsRuntime
+@inject ILogger<Home> Logger
 
 <main class="container">
     <h1>Welcome to Tauri + Blazor</h1>
@@ -79,7 +80,7 @@
     [JSInvokable]
     public Task OnScanError(string errorMessage)
     {
-        Console.WriteLine($"Scan error: {errorMessage}");
+        Logger.LogError($"Scan error: {errorMessage}");
         return Task.CompletedTask;
     }
 
@@ -94,6 +95,4 @@
         [JsonPropertyName("labelType")] public string LabelType { get; set; } = string.Empty;
         [JsonPropertyName("source")] public string Source { get; set; } = string.Empty;
     }
-
-
 }

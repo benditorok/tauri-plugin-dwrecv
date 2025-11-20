@@ -12,6 +12,27 @@ Handle Zebra DataWedge broadcast intents to receive and parse barcode data on An
 tauri-plugin-dwrecv = { git = "https://github.com/benditorok/tauri-plugin-dwrecv.git", tag = "dwrecv-v0.3.0" }
 ```
 
+- Install the JavaScript/TypeScript API package.
+
+For development/testing (local installation):
+```bash
+deno install
+```
+
+For production (install from GitHub):
+```bash
+deno add npm:tauri-plugin-dwrecv-api@github:benditorok/tauri-plugin-dwrecv
+```
+
+Or add to your `package.json`:
+```json
+{
+  "dependencies": {
+    "tauri-plugin-dwrecv-api": "github:benditorok/tauri-plugin-dwrecv"
+  }
+}
+```
+
 - Configure [`src-tauri/tauri.conf.json`].
 
   - `intentCategory` is optional.
@@ -64,135 +85,15 @@ pub fn run() {
 }
 ```
 
-### Blazor
-
-You can find an example project under [`examples/BlazorScanner`].
-
-- Create a new javascript file [`src/wwwroot/scripts/tauriEvents.js`] that imports and wraps the plugin's `onScan` API for Blazor interop.
-
-```js
-// Simple wrapper around tauri-plugin-dwrecv for Blazor interop
-class ScanListener {
-  constructor(listener) {
-    this.listener = listener;
-  }
-
-  async unregister() {
-    if (this.listener) {
-      await this.listener();
-      console.log("Scan listener unregistered successfully");
-    }
-  }
-}
-
-window.registerScanListener = async function (dotnetRef) {
-  try {
-    const { onScan } = await import("tauri-plugin-dwrecv");
-
-    const unlisten = await onScan(
-      (barcode) => dotnetRef.invokeMethodAsync("OnScanReceived", barcode),
-      (error) => dotnetRef.invokeMethodAsync("OnScanError", error),
-    );
-
-    console.log("Scan listener registered successfully");
-    return new ScanListener(unlisten);
-  } catch (e) {
-    console.error("Failed to register scan listener:", e);
-    throw e;
-  }
-};
-
-window.unregisterScanListener = async function (listener) {
-  try {
-    if (listener) {
-      await listener.unregister();
-    }
-  } catch (e) {
-    console.error("Failed to unregister scan listener:", e);
-  }
-};
-```
-
-- Include it in [`src/wwwroot/index.html`].
-
-```html
-<!-- -->
-    <body>
-        <script src="scripts/tauriEvents.js"></script>
-    </body>
-<!-- -->
-```
-
-- Define the callback methods in your Blazor component.
-
-```cs
-@using System.Text.Json
-@using System.Text.Json.Serialization
-@implements IAsyncDisposable
-
-@page "/"
-@inject IJSRuntime JsRuntime
-
-<p>Scan a barcode to see the results.</p>
-
-@code {
-    private class Barcode
-    {
-        [JsonPropertyName("data")] public string Data { get; set; }
-        [JsonPropertyName("labelType")] public string LabelType { get; set; }
-        [JsonPropertyName("source")] public string Source { get; set; }
-    }
-    
-    private IJSObjectReference? _pluginListener;
-    private DotNetObjectReference<Home>? _dotNetRef;
-    
-    protected override async Task OnInitializedAsync()
-    {
-        _dotNetRef = DotNetObjectReference.Create(this);
-        _pluginListener = await JsRuntime.InvokeAsync<IJSObjectReference>("registerScanListener", _dotNetRef);
-    }
-    
-    public async ValueTask DisposeAsync()
-    {
-        if (_pluginListener is not null)
-        {
-            await JsRuntime.InvokeVoidAsync("unregisterScanListener", _pluginListener);
-            await _pluginListener.DisposeAsync();
-        }
-        
-        _dotNetRef?.Dispose();
-    }
-    
-    [JSInvokable]
-    public Task OnScanReceived(Barcode barcode)
-    {
-        Console.WriteLine($"Barcode received: {barcode.Data}");
-        return Task.CompletedTask;
-    }
-    
-    [JSInvokable]
-    public Task OnScanError(string errorMessage)
-    {
-        Console.WriteLine($"Scan error: {errorMessage}");
-        return Task.CompletedTask;
-    }
-}
-```
-
-#### Other information
-
-- Your dev URL *should* be set to http://0.0.0.0 instead of http://localhost in:
-  - [`src/Properties/launchSettings.json`]: `"applicationUrl": "http://0.0.0.0:1420"`
-
 ### React
 
 You can find an example project under [`examples/react-scanner`].
 
-- Import and use the `onScan` function from `tauri-plugin-dwrecv`.
+- Import and use the `onScan` function from `tauri-plugin-dwrecv-api`.
 
 ```tsx
 import { useEffect } from "react";
-import { onScan } from "tauri-plugin-dwrecv";
+import { onScan } from "tauri-plugin-dwrecv-api";
 
 function App() {
   useEffect(() => {
@@ -228,6 +129,148 @@ function App() {
 
 export default App;
 ```
+
+### Blazor
+
+You can find an example project under [`examples/BlazorScanner`].
+
+- Create a new javascript file [`src/wwwroot/scripts/tauriEvents.js`] that implements the `onScan` helper using Tauri's core API.
+
+> **Note**: Blazor doesn't support ES module imports at runtime, so we use the Tauri core API directly instead of importing the npm package.
+
+```js
+// Blazor-compatible wrapper for tauri-plugin-dwrecv
+const { addPluginListener } = window.__TAURI__.core;
+
+async function onScan(onBarcode, onError) {
+  const listener = await addPluginListener("dwrecv", "dw-scan", (payload) => {
+    if ("data" in payload) {
+      onBarcode(payload);
+    } else if ("errorMessage" in payload) {
+      if (onError) {
+        onError(payload.errorMessage);
+      } else {
+        console.error("Scan error:", payload.errorMessage);
+      }
+    }
+  });
+
+  return async () => {
+    await listener.unregister();
+  };
+}
+
+class ScanListener {
+  constructor(unlistenFn) {
+    this.unlistenFn = unlistenFn;
+  }
+
+  async unregister() {
+    if (this.unlistenFn) {
+      await this.unlistenFn();
+      console.log("Scan listener unregistered successfully");
+    }
+  }
+}
+
+window.registerScanListener = async function (dotnetRef) {
+  try {
+    const unlisten = await onScan(
+      (barcode) => dotnetRef.invokeMethodAsync("OnScanReceived", barcode),
+      (error) => dotnetRef.invokeMethodAsync("OnScanError", error),
+    );
+
+    console.log("Scan listener registered successfully");
+    return new ScanListener(unlisten);
+  } catch (e) {
+    console.error("Failed to register scan listener:", e);
+    return null;
+  }
+};
+
+window.unregisterScanListener = async function (listener) {
+  try {
+    if (listener) {
+      await listener.unregister();
+    }
+  } catch (e) {
+    console.error("Failed to unregister scan listener:", e);
+  }
+};
+```
+
+- Include it in [`src/wwwroot/index.html`].
+
+```html
+<!-- -->
+    <body>
+        <script src="scripts/tauriEvents.js"></script>
+    </body>
+<!-- -->
+```
+
+- Define the callback methods in your Blazor component.
+
+```cs
+@using System.Text.Json
+@using System.Text.Json.Serialization
+@implements IAsyncDisposable
+
+@page "/"
+
+@inject IJSRuntime JsRuntime
+@inject ILogger<Home> Logger
+
+<p>Scan a barcode to see the results.</p>
+
+@code {
+    private class Barcode
+    {
+        [JsonPropertyName("data")] public string Data { get; set; }
+        [JsonPropertyName("labelType")] public string LabelType { get; set; }
+        [JsonPropertyName("source")] public string Source { get; set; }
+    }
+    
+    private IJSObjectReference? _pluginListener;
+    private DotNetObjectReference<Home>? _dotNetRef;
+    
+    protected override async Task OnInitializedAsync()
+    {
+        _dotNetRef = DotNetObjectReference.Create(this);
+        _pluginListener = await JsRuntime.InvokeAsync<IJSObjectReference>("registerScanListener", _dotNetRef);
+    }
+    
+    public async ValueTask DisposeAsync()
+    {
+        if (_pluginListener is not null)
+        {
+            await JsRuntime.InvokeVoidAsync("unregisterScanListener", _pluginListener);
+            await _pluginListener.DisposeAsync();
+        }
+        
+        _dotNetRef?.Dispose();
+    }
+    
+    [JSInvokable]
+    public Task OnScanReceived(Barcode barcode)
+    {
+        Logger.LogError($"Barcode received: {barcode.Data}");
+        return Task.CompletedTask;
+    }
+    
+    [JSInvokable]
+    public Task OnScanError(string errorMessage)
+    {
+        Logger.LogError($"Scan error: {errorMessage}");
+        return Task.CompletedTask;
+    }
+}
+```
+
+#### Other information
+
+- Your dev URL *should* be set to http://0.0.0.0 instead of http://localhost in:
+  - [`src/Properties/launchSettings.json`]: `"applicationUrl": "http://0.0.0.0:1420"`
 
 ## Testing
 

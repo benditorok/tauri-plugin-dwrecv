@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import reactLogo from "./assets/react.svg";
 import { invoke } from "@tauri-apps/api/core";
-import { onScan, type Barcode } from "tauri-plugin-dwrecv";
+import { onScan, type Barcode } from "tauri-plugin-dwrecv-api";
 import "./App.css";
 
 function App() {
