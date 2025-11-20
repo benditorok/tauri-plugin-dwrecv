@@ -1,25 +1,42 @@
-const { addPluginListener } = window.__TAURI__.core;
+// Simple wrapper around tauri-plugin-dwrecv for Blazor interop
+// This handles the listener lifecycle automatically
 
-window.registerScanListeners = async function (dotnetRef) {
+class ScanListener {
+  constructor(listener) {
+    this.listener = listener;
+  }
+
+  async unregister() {
+    if (this.listener) {
+      await this.listener();
+      console.log("Scan listener unregistered successfully");
+    }
+  }
+}
+
+window.registerScanListener = async function (dotnetRef) {
   try {
-    const listener = await addPluginListener("dwrecv", "dw-scan", (payload) =>
-      dotnetRef.invokeMethodAsync("OnScanReceived", payload),
+    // Import the onScan function from the plugin
+    const { onScan } = await import("tauri-plugin-dwrecv");
+
+    const unlisten = await onScan(
+      (barcode) => dotnetRef.invokeMethodAsync("OnScanReceived", barcode),
+      (error) => dotnetRef.invokeMethodAsync("OnScanError", error),
     );
-    console.log("Handle registered successfully");
-    return listener;
+
+    console.log("Scan listener registered successfully");
+    return new ScanListener(unlisten);
   } catch (e) {
-    console.error("Failed to register handle: {e}", e);
-    return null;
+    console.error("Failed to register scan listener:", e);
   }
 };
 
-window.unregisterScanListeners = async function (listener) {
+window.unregisterScanListener = async function (listener) {
   try {
     if (listener) {
       await listener.unregister();
-      console.log("Handle unregistered successfully");
     }
   } catch (e) {
-    console.error("Failed to unregister handle: {e}", e);
+    console.error("Failed to unregister scan listener:", e);
   }
 };

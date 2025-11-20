@@ -46,14 +46,14 @@
     protected override async Task OnInitializedAsync()
     {
         _dotNetRef = DotNetObjectReference.Create(this);
-        _pluginListener = await JsRuntime.InvokeAsync<IJSObjectReference>("registerScanListeners", _dotNetRef);
+        _pluginListener = await JsRuntime.InvokeAsync<IJSObjectReference>("registerScanListener", _dotNetRef);
     }
 
     public async ValueTask DisposeAsync()
     {
         if (_pluginListener is not null)
         {
-            await JsRuntime.InvokeVoidAsync("unregisterScanListeners", _pluginListener);
+            await JsRuntime.InvokeVoidAsync("unregisterScanListener", _pluginListener);
             await _pluginListener.DisposeAsync();
         }
 
@@ -64,7 +64,6 @@
     public async Task OnScanReceived(JsonElement payload)
     {
         var barcode = JsonSerializer.Deserialize<Barcode>(payload.GetRawText());
-        _ = JsonSerializer.Deserialize<ScanError>(payload.GetRawText());
         BarcodeContent = barcode?.Data;
 
         await InvokeAsync(StateHasChanged);
@@ -75,6 +74,13 @@
             BarcodeContent = null;
             await InvokeAsync(StateHasChanged);
         });
+    }
+
+    [JSInvokable]
+    public Task OnScanError(string errorMessage)
+    {
+        Console.WriteLine($"Scan error: {errorMessage}");
+        return Task.CompletedTask;
     }
 
     private async Task GreetAsync()
@@ -89,8 +95,5 @@
         [JsonPropertyName("source")] public string Source { get; set; } = string.Empty;
     }
 
-    private class ScanError
-    {
-        [JsonPropertyName("errorMessage")] public string ErrorMessage { get; set; } = string.Empty;
-    }
+
 }

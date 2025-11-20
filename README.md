@@ -68,34 +68,47 @@ pub fn run() {
 
 You can find an example project under [`examples/BlazorScanner`].
 
-- Create a new javascript file [`src/wwwroot/scripts/tauriEvents.js`] with a function name which will be defined in Blazor like `OnScanReceived`.
+- Create a new javascript file [`src/wwwroot/scripts/tauriEvents.js`] that imports and wraps the plugin's `onScan` API for Blazor interop.
 
 ```js
-const { addPluginListener } = window.__TAURI__.core;
+// Simple wrapper around tauri-plugin-dwrecv for Blazor interop
+class ScanListener {
+  constructor(listener) {
+    this.listener = listener;
+  }
 
-window.registerScanListeners = async function (dotnetRef) {
+  async unregister() {
+    if (this.listener) {
+      await this.listener();
+      console.log("Scan listener unregistered successfully");
+    }
+  }
+}
+
+window.registerScanListener = async function (dotnetRef) {
   try {
-    const listener = await addPluginListener(
-        'dwrecv',
-        'dw-scan',
-        (payload) => dotnetRef.invokeMethodAsync('OnScanReceived', payload)
+    const { onScan } = await import("tauri-plugin-dwrecv");
+
+    const unlisten = await onScan(
+      (barcode) => dotnetRef.invokeMethodAsync("OnScanReceived", barcode),
+      (error) => dotnetRef.invokeMethodAsync("OnScanError", error),
     );
-    console.log("Handle registered successfully");
-    return listener;
+
+    console.log("Scan listener registered successfully");
+    return new ScanListener(unlisten);
   } catch (e) {
-    console.error("Failed to register handle: {e}", e);
-    return null;
+    console.error("Failed to register scan listener:", e);
+    throw e;
   }
 };
 
-window.unregisterScanListeners = async function (listener) {
+window.unregisterScanListener = async function (listener) {
   try {
     if (listener) {
       await listener.unregister();
-      console.log("Handle unregistered successfully");
     }
   } catch (e) {
-    console.error("Failed to unregister handle: {e}", e);
+    console.error("Failed to unregister scan listener:", e);
   }
 };
 ```
@@ -110,7 +123,7 @@ window.unregisterScanListeners = async function (listener) {
 <!-- -->
 ```
 
-- Define the function calls in Blazor.
+- Define the callback methods in your Blazor component.
 
 ```cs
 @using System.Text.Json
@@ -118,8 +131,9 @@ window.unregisterScanListeners = async function (listener) {
 @implements IAsyncDisposable
 
 @page "/"
+@inject IJSRuntime JsRuntime
 
-<p>Check the console for barcode scan results.</p>
+<p>Scan a barcode to see the results.</p>
 
 @code {
     private class Barcode
@@ -129,25 +143,20 @@ window.unregisterScanListeners = async function (listener) {
         [JsonPropertyName("source")] public string Source { get; set; }
     }
     
-    private class ScanError
-    {
-        [JsonPropertyName("errorMessage")] public string ErrorMessage { get; set; }
-    }
-    
     private IJSObjectReference? _pluginListener;
     private DotNetObjectReference<Home>? _dotNetRef;
     
     protected override async Task OnInitializedAsync()
     {
         _dotNetRef = DotNetObjectReference.Create(this);
-        _pluginListener = await JsRuntime.InvokeAsync<IJSObjectReference>("registerScanListeners", _dotNetRef);
+        _pluginListener = await JsRuntime.InvokeAsync<IJSObjectReference>("registerScanListener", _dotNetRef);
     }
     
     public async ValueTask DisposeAsync()
     {
         if (_pluginListener is not null)
         {
-            await JsRuntime.InvokeVoidAsync("unregisterScanListeners", _pluginListener);
+            await JsRuntime.InvokeVoidAsync("unregisterScanListener", _pluginListener);
             await _pluginListener.DisposeAsync();
         }
         
@@ -155,11 +164,17 @@ window.unregisterScanListeners = async function (listener) {
     }
     
     [JSInvokable]
-    public Task OnScanReceived(JsonElement payload)
+    public Task OnScanReceived(Barcode barcode)
     {
-        var barcode = JsonSerializer.Deserialize<Barcode>(payload.GetRawText());
-        var error = JsonSerializer.Deserialize<ScanError>(payload.GetRawText());
-        Logger.LogInformation("Barcode received: {Barcode}", barcode.Data);
+        Console.WriteLine($"Barcode received: {barcode.Data}");
+        return Task.CompletedTask;
+    }
+    
+    [JSInvokable]
+    public Task OnScanError(string errorMessage)
+    {
+        Console.WriteLine($"Scan error: {errorMessage}");
+        return Task.CompletedTask;
     }
 }
 ```
@@ -173,37 +188,22 @@ window.unregisterScanListeners = async function (listener) {
 
 You can find an example project under [`examples/react-scanner`].
 
-- Register the listener using `addPluginListener` and store it for cleanup.
+- Import and use the `onScan` function from `tauri-plugin-dwrecv`.
 
 ```tsx
-import { useState, useEffect } from "react";
-import { addPluginListener, type PluginListener } from "@tauri-apps/api/core";
-
-interface Barcode {
-  data: string;
-  labelType: string;
-  source: string;
-}
-
-interface ScanError {
-  errorMessage: string;
-}
-
-type ScanPayload = Barcode | ScanError;
+import { useEffect } from "react";
+import { onScan } from "tauri-plugin-dwrecv";
 
 function App() {
   useEffect(() => {
-    let unlisten: PluginListener | undefined;
+    let unlisten: (() => Promise<void>) | undefined;
 
     const setupListener = async () => {
       try {
-        unlisten = await addPluginListener("dwrecv", "dw-scan", (payload: ScanPayload) => {
-          if ("data" in payload) {
-            console.log("Barcode received:", payload.data);
-          } else if ("errorMessage" in payload) {
-            console.error("Scan error:", payload.errorMessage);
-          }
-        });
+        unlisten = await onScan(
+          (barcode) => console.log("Barcode received:", barcode.data),
+          (error) => console.error("Scan error:", error),
+        );
         console.log("Scan listener registered successfully");
       } catch (e) {
         console.error("Failed to register scan listener:", e);
@@ -214,14 +214,14 @@ function App() {
 
     return () => {
       if (unlisten) {
-        unlisten.unregister();
+        unlisten();
       }
     };
   }, []);
 
   return (
     <main>
-      <p>Check the console for barcode scan results.</p>
+      <p>Scan a barcode to see the results in the console.</p>
     </main>
   );
 }
