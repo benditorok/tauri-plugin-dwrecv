@@ -204,6 +204,8 @@ window.unregisterScanListener = async function (listener) {
 ```html
 <!-- -->
     <body>
+        <script src="_framework/blazor.webassembly.js"></script>
+        <!-- Initialize Tauri event listeners after Blazor is loaded -->
         <script src="scripts/tauriEvents.js"></script>
     </body>
 <!-- -->
