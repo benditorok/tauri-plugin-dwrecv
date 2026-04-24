@@ -9,10 +9,10 @@ exclude = ["/examples", "/dist-js", "/guest-js", "/node_modules"]
 links = "tauri-plugin-dwrecv"
 
 [dependencies]
-tauri = { version = "2.9.3" }
+tauri = { version = "2.10.3" }
 serde = "1.0.228"
-thiserror = "2.0.17"
+thiserror = "2.0.18"
 
 [build-dependencies]
-tauri-plugin = { version = "2.5.1", features = ["build"] }
-tauri-build = "2.5.2"
+tauri-plugin = { version = "2.5.4", features = ["build"] }
+tauri-build = "2.5.6"
