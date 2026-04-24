@@ -49,7 +49,7 @@ function App() {
     <main className="container">
       <h1>Welcome to Tauri + React</h1>
 
-      <div className="row">
+      <div className="row brand-row">
         <a href="https://vite.dev" target="_blank">
           <img src="/vite.svg" className="logo vite" alt="Vite logo" />
         </a>
@@ -63,7 +63,7 @@ function App() {
       <p>Click on the Tauri, Vite, and React logos to learn more.</p>
 
       <form
-        className="row"
+        className="row greet-form"
         onSubmit={(e) => {
           e.preventDefault();
           greet();
@@ -75,17 +75,7 @@ function App() {
       <p>{greetMsg}</p>
 
       {barcodeContent && (
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            backgroundColor: "oklch(81% 0.117 11.638)",
-            padding: "1rem",
-            marginTop: "1rem",
-            borderRadius: "0.5rem",
-          }}
-        >
+        <div className="scan-result">
           <p>{barcodeContent}</p>
         </div>
       )}
