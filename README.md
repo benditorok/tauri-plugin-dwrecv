@@ -329,3 +329,8 @@ $ ./gradlew compileDebugKotlin --scan
 # License 
 
 MIT
+
+## Trademark Notice
+
+Zebra and DataWedge are trademarks or registered trademarks of Zebra Technologies Corporation.
+This project is independent and is not affiliated with, endorsed by, or sponsored by Zebra Technologies Corporation.
