@@ -1,8 +1,8 @@
 {
   "name": "tauri-plugin-dwrecv-api",
-  "version": "0.1.0",
-  "author": "You",
-  "description": "",
+  "version": "0.4.0",
+  "author": "benditorok",
+  "description": "Handle Zebra DataWedge broadcast intents to receive and parse barcode data on Android.",
   "type": "module",
   "types": "./dist-js/index.d.ts",
   "main": "./dist-js/index.cjs",
