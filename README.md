@@ -9,7 +9,7 @@ Handle Zebra DataWedge broadcast intents to receive and parse barcode data on An
 
 ```toml
 [dependencies]
-tauri-plugin-dwrecv = { git = "https://github.com/benditorok/tauri-plugin-dwrecv.git", tag = "dwrecv-v0.3.0" }
+tauri-plugin-dwrecv = { git = "https://github.com/benditorok/tauri-plugin-dwrecv.git", tag = "dwrecv-v0.4.0" }
 ```
 
 - Install the JavaScript/TypeScript API package.
