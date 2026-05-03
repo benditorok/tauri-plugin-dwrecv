@@ -1,20 +1,8 @@
 import { useState, useEffect } from "react";
 import reactLogo from "./assets/react.svg";
 import { invoke } from "@tauri-apps/api/core";
-import { addPluginListener, type PluginListener } from "@tauri-apps/api/core";
+import { onScan, type Barcode } from "tauri-plugin-dwrecv-api";
 import "./App.css";
-
-interface Barcode {
-  data: string;
-  labelType: string;
-  source: string;
-}
-
-interface ScanError {
-  errorMessage: string;
-}
-
-type ScanPayload = Barcode | ScanError;
 
 function App() {
   const [greetMsg, setGreetMsg] = useState("");
@@ -22,22 +10,21 @@ function App() {
   const [barcodeContent, setBarcodeContent] = useState<string | null>(null);
 
   useEffect(() => {
-    let unlisten: PluginListener | undefined;
+    let unlisten: (() => Promise<void>) | undefined;
 
     const setupListener = async () => {
       try {
-        unlisten = await addPluginListener("dwrecv", "dw-scan", (payload: ScanPayload) => {
-          if ("data" in payload) {
-            setBarcodeContent(payload.data);
+        unlisten = await onScan(
+          (barcode: Barcode) => {
+            setBarcodeContent(barcode.data);
 
             // Clear barcode after 2 seconds
             setTimeout(() => {
               setBarcodeContent(null);
             }, 2000);
-          } else if ("errorMessage" in payload) {
-            console.error("Scan error:", payload.errorMessage);
-          }
-        });
+          },
+          (error: string) => console.error("Scan error:", error),
+        );
         console.log("Scan listener registered successfully");
       } catch (e) {
         console.error("Failed to register scan listener:", e);
@@ -48,7 +35,7 @@ function App() {
 
     return () => {
       if (unlisten) {
-        unlisten.unregister();
+        unlisten();
       }
     };
   }, []);
@@ -62,7 +49,7 @@ function App() {
     <main className="container">
       <h1>Welcome to Tauri + React</h1>
 
-      <div className="row">
+      <div className="row brand-row">
         <a href="https://vite.dev" target="_blank">
           <img src="/vite.svg" className="logo vite" alt="Vite logo" />
         </a>
@@ -76,7 +63,7 @@ function App() {
       <p>Click on the Tauri, Vite, and React logos to learn more.</p>
 
       <form
-        className="row"
+        className="row greet-form"
         onSubmit={(e) => {
           e.preventDefault();
           greet();
@@ -88,17 +75,7 @@ function App() {
       <p>{greetMsg}</p>
 
       {barcodeContent && (
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            backgroundColor: "oklch(81% 0.117 11.638)",
-            padding: "1rem",
-            marginTop: "1rem",
-            borderRadius: "0.5rem",
-          }}
-        >
+        <div className="scan-result">
           <p>{barcodeContent}</p>
         </div>
       )}
