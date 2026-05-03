@@ -5,6 +5,7 @@
 .logo.react:hover {
   filter: drop-shadow(0 0 2em #61dafb);
 }
+
 :root {
   font-family: Inter, Avenir, Helvetica, Arial, sans-serif;
   font-size: 16px;
@@ -21,18 +22,27 @@
   -webkit-text-size-adjust: 100%;
 }
 
-.container {
+body {
   margin: 0;
-  padding-top: 10vh;
+}
+
+.container {
+  box-sizing: border-box;
+  width: min(100%, 56rem);
+  min-height: 100vh;
+  margin: 0 auto;
+  padding: clamp(2rem, 8vh, 5rem) 1.25rem 2rem;
   display: flex;
   flex-direction: column;
+  align-items: center;
   justify-content: center;
+  gap: 1rem;
   text-align: center;
 }
 
 .logo {
-  height: 6em;
-  padding: 1.5em;
+  height: clamp(4rem, 18vw, 6rem);
+  padding: clamp(0.75rem, 3vw, 1.5rem);
   will-change: filter;
   transition: 0.75s;
 }
@@ -44,6 +54,13 @@
 .row {
   display: flex;
   justify-content: center;
+  align-items: center;
+  width: 100%;
+  gap: 0.75rem;
+}
+
+.brand-row {
+  flex-wrap: wrap;
 }
 
 a {
@@ -60,12 +77,19 @@ h1 {
   text-align: center;
 }
 
+p {
+  margin: 0;
+}
+
 input,
 button {
+  box-sizing: border-box;
   border-radius: 8px;
   border: 1px solid transparent;
+  min-height: 2.75rem;
   padding: 0.6em 1.2em;
   font-size: 1em;
+  line-height: 1.2;
   font-weight: 500;
   font-family: inherit;
   color: #0f0f0f;
@@ -81,6 +105,7 @@ button {
 button:hover {
   border-color: #396cd8;
 }
+
 button:active {
   border-color: #396cd8;
   background-color: #e8e8e8;
@@ -91,8 +116,46 @@ button {
   outline: none;
 }
 
+.greet-form {
+  max-width: 28rem;
+}
+
 #greet-input {
-  margin-right: 5px;
+  flex: 1 1 14rem;
+  min-width: 0;
+}
+
+.scan-result {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: min(100%, 28rem);
+  background-color: oklch(81% 0.117 11.638);
+  padding: 1rem;
+  margin-top: 1rem;
+  border-radius: 0.5rem;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 640px) {
+  .container {
+    justify-content: flex-start;
+  }
+
+  .greet-form {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  #greet-input {
+    flex: 0 0 auto;
+  }
+
+  #greet-input,
+  .greet-form button,
+  .scan-result {
+    width: 100%;
+  }
 }
 
 @media (prefers-color-scheme: dark) {
@@ -110,6 +173,7 @@ button {
     color: #ffffff;
     background-color: #0f0f0f98;
   }
+
   button:active {
     background-color: #0f0f0f69;
   }
