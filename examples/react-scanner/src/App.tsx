@@ -1,19 +1,27 @@
 import { useState, useEffect } from "react";
 import reactLogo from "./assets/react.svg";
 import { invoke } from "@tauri-apps/api/core";
-import { onScan, type Barcode } from "tauri-plugin-dwrecv-api";
+import { checkStatus, onScan, type Barcode } from "tauri-plugin-dwrecv-api";
 import "./App.css";
 
 function App() {
   const [greetMsg, setGreetMsg] = useState("");
   const [name, setName] = useState("");
   const [barcodeContent, setBarcodeContent] = useState<string | null>(null);
+  const [scanStatus, setScanStatus] = useState("Checking scanner support…");
 
   useEffect(() => {
     let unlisten: (() => Promise<void>) | undefined;
+    let disposed = false;
 
     const setupListener = async () => {
       try {
+        const status = await checkStatus();
+        if (disposed) return;
+        if (!status.isAvailable) {
+          setScanStatus("Scanning is unavailable on this platform. Use an Android device.");
+          return;
+        }
         unlisten = await onScan(
           (barcode: Barcode) => {
             setBarcodeContent(barcode.data);
@@ -25,8 +33,14 @@ function App() {
           },
           (error: string) => console.error("Scan error:", error),
         );
+        if (disposed) {
+          await unlisten();
+          return;
+        }
+        setScanStatus("Ready to receive scans.");
         console.log("Scan listener registered successfully");
       } catch (e) {
+        if (!disposed) setScanStatus("Could not initialize scanning.");
         console.error("Failed to register scan listener:", e);
       }
     };
@@ -34,6 +48,7 @@ function App() {
     setupListener();
 
     return () => {
+      disposed = true;
       if (unlisten) {
         unlisten();
       }
@@ -73,6 +88,7 @@ function App() {
         <button type="submit">Greet</button>
       </form>
       <p>{greetMsg}</p>
+      <p role="status">{scanStatus}</p>
 
       {barcodeContent && (
         <div className="scan-result">

@@ -1,7 +1,9 @@
 // Blazor-compatible wrapper for tauri-plugin-dwrecv
 // This uses the Tauri core API directly since Blazor doesn't support ES module imports
 
-const { addPluginListener } = window.__TAURI__.core;
+const { invoke, addPluginListener } = window.__TAURI__.core;
+
+window.checkScanStatus = () => invoke("plugin:dwrecv|status");
 
 /**
  * Helper function to register a scan listener with simplified callbacks
@@ -10,6 +12,10 @@ const { addPluginListener } = window.__TAURI__.core;
  * @returns {Promise<Function>} Unlisten function
  */
 async function onScan(onBarcode, onError) {
+  const status = await window.checkScanStatus();
+  if (!status.isAvailable) {
+    throw new Error("Android intent reception is only supported on Android");
+  }
   const listener = await addPluginListener("dwrecv", "dw-scan", (payload) => {
     if ("data" in payload) {
       onBarcode(payload);

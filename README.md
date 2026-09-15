@@ -2,6 +2,29 @@
 
 Handle Zebra DataWedge broadcast intents to receive and parse barcode data on Android.
 
+## Platform support
+
+Register the plugin on every platform. Android intent reception is available on
+Android; other platforms provide status reporting and reject scan/ping operations.
+Native Android registration remains internal to the plugin.
+
+`checkStatus()` returns `{ isAvailable: true }` on Android and
+`{ isAvailable: false, reason: "unsupportedPlatform" }` elsewhere. This checks
+only platform support, not DataWedge, intent senders, hardware, or configuration.
+Missing plugin registration and permission failures reject the call.
+
+```ts
+import { checkStatus, onScan } from "tauri-plugin-dwrecv-api";
+
+const status = await checkStatus();
+if (status.isAvailable) {
+  const unlisten = await onScan((barcode) => console.log(barcode.data));
+  // Call await unlisten() when disposing the listener.
+} else {
+  console.log("Scanning is only available on Android.");
+}
+```
+
 ## Usage
 
 - Create a new project: [Tauri Guide](https://tauri.app/start/).

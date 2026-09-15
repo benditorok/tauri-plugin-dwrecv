@@ -1,4 +1,3 @@
-use serde::de::DeserializeOwned;
 use tauri::{
     plugin::{PluginApi, PluginHandle},
     AppHandle, Runtime,
@@ -6,18 +5,12 @@ use tauri::{
 
 use crate::models::*;
 
-#[cfg(target_os = "ios")]
-tauri::ios_plugin_binding!(init_plugin_dwrecv);
-
-// initializes the Kotlin or Swift plugin classes
+// Initializes the Android Kotlin plugin class.
 pub fn init<R: Runtime>(
     _app: &AppHandle<R>,
     api: PluginApi<R, PluginConfig>,
 ) -> crate::Result<Dwrecv<R>> {
-    #[cfg(target_os = "android")]
     let handle = api.register_android_plugin("com.benditorok.dwrecv", "DWIntentReceiverPlugin")?;
-    #[cfg(target_os = "ios")]
-    let handle = api.register_ios_plugin(init_plugin_dwrecv)?;
     Ok(Dwrecv(handle))
 }
 

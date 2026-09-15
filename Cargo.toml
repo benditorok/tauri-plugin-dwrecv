@@ -8,6 +8,13 @@ rust-version = "1.95.0"
 exclude = ["/examples", "/dist-js", "/guest-js", "/node_modules"]
 links = "tauri-plugin-dwrecv"
 
+[package.metadata.platforms.support]
+android = { level = "full", notes = "Receives Android broadcast intents." }
+ios = { level = "none" }
+windows = { level = "none" }
+linux = { level = "none" }
+macos = { level = "none" }
+
 [dependencies]
 tauri = { version = "2.11.5" }
 serde = "1"
