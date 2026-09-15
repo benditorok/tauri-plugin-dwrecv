@@ -45,8 +45,8 @@ class DWIntentReceiverPlugin(private val activity: Activity) : Plugin(activity) 
         val categoryLog = intentCategory?.let { "category: $it" } ?: "no category"
         Log.i(TAG, "Loading plugin with intent action: $intentAction, $categoryLog")
 
-        // Load configuration if available
-        getConfig(Config::class.java)?.let { config ->
+        // Load configuration
+        getConfig(Config::class.java).let { config ->
             pingValue = config.pingValue ?: pingValue
             intentAction = config.intentAction ?: intentAction
             intentCategory = config.intentCategory
