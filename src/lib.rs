@@ -5,10 +5,10 @@ use tauri::{
 
 pub use models::*;
 
-#[cfg(desktop)]
-mod desktop;
-#[cfg(mobile)]
-mod mobile;
+#[cfg(target_os = "android")]
+mod android;
+#[cfg(not(target_os = "android"))]
+mod unsupported;
 
 mod commands;
 mod error;
@@ -16,10 +16,10 @@ mod models;
 
 pub use error::{Error, Result};
 
-#[cfg(desktop)]
-use desktop::Dwrecv;
-#[cfg(mobile)]
-use mobile::Dwrecv;
+#[cfg(target_os = "android")]
+pub use android::Dwrecv;
+#[cfg(not(target_os = "android"))]
+pub use unsupported::Dwrecv;
 
 /// Extensions to [`tauri::App`], [`tauri::AppHandle`] and [`tauri::Window`] to access the dwrecv APIs.
 pub trait DwrecvExt<R: Runtime> {
@@ -34,15 +34,33 @@ impl<R: Runtime, T: Manager<R>> crate::DwrecvExt<R> for T {
 
 /// Initializes the plugin.
 pub fn init<R: Runtime>() -> TauriPlugin<R, models::PluginConfig> {
-    Builder::<R, models::PluginConfig>::new("dwrecv")
-        .invoke_handler(tauri::generate_handler![commands::ping,])
+    let builder = Builder::<R, models::PluginConfig>::new("dwrecv");
+    #[cfg(target_os = "android")]
+    let builder = builder.invoke_handler(tauri::generate_handler![commands::ping, commands::status]);
+    #[cfg(not(target_os = "android"))]
+    let builder = builder.invoke_handler(tauri::generate_handler![
+        commands::ping,
+        commands::status,
+        commands::register_listener,
+        commands::unregister_listener,
+        commands::remove_listener,
+    ]);
+
+    builder
         .setup(|app, api| {
-            #[cfg(mobile)]
-            let dwrecv = mobile::init(app, api)?;
-            #[cfg(desktop)]
-            let dwrecv = desktop::init(app, api)?;
+            #[cfg(target_os = "android")]
+            let dwrecv = android::init(app, api)?;
+            #[cfg(not(target_os = "android"))]
+            let dwrecv = unsupported::init(app, api)?;
             app.manage(dwrecv);
             Ok(())
         })
         .build()
+}
+
+impl<R: Runtime> Dwrecv<R> {
+    /// Reports platform support only; does not probe intent senders or hardware.
+    pub fn status(&self) -> Status {
+        Status::current()
+    }
 }

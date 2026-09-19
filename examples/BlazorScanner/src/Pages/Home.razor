@@ -24,6 +24,7 @@
         <button type="submit">Greet</button>
     </form>
     <p>@GreetMsg</p>
+    <p role="status">@ScanStatus</p>
 
     @if (BarcodeContent is not null)
     {
@@ -40,14 +41,30 @@
     private string? GreetMsg { get; set; }
 
     private string? BarcodeContent { get; set; }
+    private string ScanStatus { get; set; } = "Checking scanner support…";
 
     private IJSObjectReference? _pluginListener;
     private DotNetObjectReference<Home>? _dotNetRef;
 
     protected override async Task OnInitializedAsync()
     {
-        _dotNetRef = DotNetObjectReference.Create(this);
-        _pluginListener = await JsRuntime.InvokeAsync<IJSObjectReference>("registerScanListener", _dotNetRef);
+        try
+        {
+            var status = await JsRuntime.InvokeAsync<JsonElement>("checkScanStatus");
+            if (!status.GetProperty("isAvailable").GetBoolean())
+            {
+                ScanStatus = "Scanning is unavailable on this platform. Use an Android device.";
+                return;
+            }
+            _dotNetRef = DotNetObjectReference.Create(this);
+            _pluginListener = await JsRuntime.InvokeAsync<IJSObjectReference>("registerScanListener", _dotNetRef);
+            ScanStatus = _pluginListener is null ? "Could not initialize scanning." : "Ready to receive scans.";
+        }
+        catch (JSException e)
+        {
+            ScanStatus = "Could not initialize scanning.";
+            Logger.LogError(e, "Failed to initialize scanning");
+        }
     }
 
     public async ValueTask DisposeAsync()

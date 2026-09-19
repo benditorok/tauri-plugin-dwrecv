@@ -1,3 +1,3 @@
 [default]
 description = "Default permissions for the plugin"
-permissions = ["allow-ping", "allow-register-listener", "allow-unregister-listener"]
+permissions = ["allow-status", "allow-ping", "allow-register-listener", "allow-unregister-listener", "allow-remove-listener"]
