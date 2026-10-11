@@ -5,7 +5,7 @@ Handle Zebra DataWedge broadcast intents to receive and parse barcode data on An
 ## Platform support
 
 Register the plugin on every platform. Android intent reception is available on
-Android; other platforms provide status reporting and reject scan/ping operations.
+Android; other platforms provide status reporting and reject scan operations.
 Native Android registration remains internal to the plugin.
 
 `checkStatus()` returns `{ isAvailable: true }` on Android and
@@ -21,7 +21,7 @@ if (status.isAvailable) {
   const unlisten = await onScan((barcode) => console.log(barcode.data));
   // Call await unlisten() when disposing the listener.
 } else {
-  console.log("Scanning is only available on Android.");
+  console.log("Scanning is not supported on this platform.");
 }
 ```
 
@@ -67,7 +67,6 @@ Or add to your `package.json`:
   "bundle": {},
   "plugins": {
     "dwrecv": {
-      "pingValue": "ping",
       "intentAction": "com.your.intentName",
       "intentCategory": "android.intent.category.DEFAULT"
     }
@@ -75,7 +74,9 @@ Or add to your `package.json`:
 }
 ```
 
-- Enable `dwrecv:default` in [`src-tauri/capabilities/mobile.json`].
+- Enable `dwrecv:allow-status` in [`src-tauri/capabilities/default.json`] so that
+  availability can be checked on every platform. The scan operations also need
+  `dwrecv:default` in [`src-tauri/capabilities/mobile.json`].
 
 ```json
 {
@@ -116,7 +117,7 @@ You can find an example project under [`examples/react-scanner`].
 
 ```tsx
 import { useEffect } from "react";
-import { onScan } from "tauri-plugin-dwrecv-api";
+import { checkStatus, onScan } from "tauri-plugin-dwrecv-api";
 
 function App() {
   useEffect(() => {
@@ -124,6 +125,11 @@ function App() {
 
     const setupListener = async () => {
       try {
+        const status = await checkStatus();
+        if (!status.isAvailable) {
+          console.log("Scanning is not supported on this platform.");
+          return;
+        }
         unlisten = await onScan(
           (barcode) => console.log("Barcode received:", barcode.data),
           (error) => console.error("Scan error:", error),
@@ -163,9 +169,15 @@ You can find an example project under [`examples/BlazorScanner`].
 
 ```js
 // Blazor-compatible wrapper for tauri-plugin-dwrecv
-const { addPluginListener } = window.__TAURI__.core;
+const { invoke, addPluginListener } = window.__TAURI__.core;
+
+window.checkScanStatus = () => invoke("plugin:dwrecv|status");
 
 async function onScan(onBarcode, onError) {
+  const status = await window.checkScanStatus();
+  if (!status.isAvailable) {
+    throw new Error("Scanning is not supported on this platform.");
+  }
   const listener = await addPluginListener("dwrecv", "dw-scan", (payload) => {
     if ("data" in payload) {
       onBarcode(payload);
@@ -261,6 +273,12 @@ window.unregisterScanListener = async function (listener) {
     
     protected override async Task OnInitializedAsync()
     {
+        var status = await JsRuntime.InvokeAsync<JsonElement>("checkScanStatus");
+        if (!status.GetProperty("isAvailable").GetBoolean())
+        {
+            Logger.LogInformation("Scanning is not supported on this platform.");
+            return;
+        }
         _dotNetRef = DotNetObjectReference.Create(this);
         _pluginListener = await JsRuntime.InvokeAsync<IJSObjectReference>("registerScanListener", _dotNetRef);
     }
@@ -298,6 +316,35 @@ window.unregisterScanListener = async function (listener) {
   - [`src/Properties/launchSettings.json`]: `"applicationUrl": "http://0.0.0.0:1420"`
 
 ## Testing
+
+### Rust and JavaScript checks
+
+Run the Rust tests from the repository root:
+
+```bash
+cargo test
+```
+
+Build the JavaScript API before running its tests, which import `dist-js/index.js`:
+
+```bash
+npm run build
+node tests/api.test.mjs
+```
+
+### Kotlin checks
+
+With Java and the Android SDK configured, run these commands from the repository
+root. The Cargo check requires the `aarch64-linux-android` Rust target and generates
+the Tauri Android dependency in `android/.tauri/tauri-api`.
+
+```bash
+cargo check --target aarch64-linux-android
+cd android
+./gradlew :compileDebugKotlin :testDebugUnitTest
+```
+
+On Windows, use `gradlew.bat` instead of `./gradlew`.
 
 You can send intents using `adb` to your device. Make sure your device is connected with `adb devices`.
 
@@ -338,15 +385,6 @@ $ adb shell am broadcast \
   --es 'com.symbol.datawedge.label_type' 'CODE128' \
   --es 'com.symbol.datawedge.data_string' '1234567890123' \
   --es 'com.symbol.datawedge.source' 'test-scanner'
-```
-
-## Plugin development information
-  
-### Show Kotlin compilation errors
-
-```bash
-$ cd src-tauri/gen/android/
-$ ./gradlew compileDebugKotlin --scan
 ```
 
 # License 

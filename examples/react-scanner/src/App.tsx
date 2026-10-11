@@ -19,7 +19,7 @@ function App() {
         const status = await checkStatus();
         if (disposed) return;
         if (!status.isAvailable) {
-          setScanStatus("Scanning is unavailable on this platform. Use an Android device.");
+          setScanStatus("Scanning is not supported on this platform.");
           return;
         }
         unlisten = await onScan(

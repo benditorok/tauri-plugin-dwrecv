@@ -31,15 +31,6 @@ export interface DataWedgeError {
   error_message: string;
 }
 
-/** Android only. Requires the dwrecv plugin to be registered. */
-export async function ping(value: string): Promise<string | null> {
-  return await invoke<{ value?: string }>("plugin:dwrecv|ping", {
-    payload: {
-      value,
-    },
-  }).then((r) => (r.value ? r.value : null));
-}
-
 /**
  * Register a listener for barcode scan events from DataWedge.
  * Android only; rejects on unsupported platforms. Requires the dwrecv plugin.
@@ -65,7 +56,7 @@ export async function onScan(
 ): Promise<() => Promise<void>> {
   const status = await checkStatus();
   if (!status.isAvailable) {
-    throw new Error("Android intent reception is only supported on Android");
+    throw new Error("Scanning is not supported on this platform.");
   }
   const listener: PluginListener = await addPluginListener("dwrecv", "dw-scan", (payload: ScanPayload) => {
     if ("data" in payload) {

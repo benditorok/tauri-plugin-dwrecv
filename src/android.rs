@@ -1,6 +1,6 @@
 use tauri::{
-    plugin::{PluginApi, PluginHandle},
     AppHandle, Runtime,
+    plugin::{PluginApi, PluginHandle},
 };
 
 use crate::models::*;
@@ -11,16 +11,10 @@ pub fn init<R: Runtime>(
     api: PluginApi<R, PluginConfig>,
 ) -> crate::Result<Dwrecv<R>> {
     let handle = api.register_android_plugin("com.benditorok.dwrecv", "DWIntentReceiverPlugin")?;
-    Ok(Dwrecv(handle))
+    Ok(Dwrecv { _handle: handle })
 }
 
 /// Access to the dwrecv APIs.
-pub struct Dwrecv<R: Runtime>(PluginHandle<R>);
-
-impl<R: Runtime> Dwrecv<R> {
-    pub fn ping(&self, payload: PingRequest) -> crate::Result<PingResponse> {
-        self.0
-            .run_mobile_plugin("ping", payload)
-            .map_err(Into::into)
-    }
+pub struct Dwrecv<R: Runtime> {
+    _handle: PluginHandle<R>,
 }

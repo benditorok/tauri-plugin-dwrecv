@@ -53,7 +53,7 @@
             var status = await JsRuntime.InvokeAsync<JsonElement>("checkScanStatus");
             if (!status.GetProperty("isAvailable").GetBoolean())
             {
-                ScanStatus = "Scanning is unavailable on this platform. Use an Android device.";
+                ScanStatus = "Scanning is not supported on this platform.";
                 return;
             }
             _dotNetRef = DotNetObjectReference.Create(this);

@@ -14,7 +14,7 @@ window.checkScanStatus = () => invoke("plugin:dwrecv|status");
 async function onScan(onBarcode, onError) {
   const status = await window.checkScanStatus();
   if (!status.isAvailable) {
-    throw new Error("Android intent reception is only supported on Android");
+    throw new Error("Scanning is not supported on this platform.");
   }
   const listener = await addPluginListener("dwrecv", "dw-scan", (payload) => {
     if ("data" in payload) {

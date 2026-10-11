@@ -1,6 +1,6 @@
 use tauri::{
-    plugin::{Builder, TauriPlugin},
     Manager, Runtime,
+    plugin::{Builder, TauriPlugin},
 };
 
 pub use models::*;
@@ -34,19 +34,8 @@ impl<R: Runtime, T: Manager<R>> crate::DwrecvExt<R> for T {
 
 /// Initializes the plugin.
 pub fn init<R: Runtime>() -> TauriPlugin<R, models::PluginConfig> {
-    let builder = Builder::<R, models::PluginConfig>::new("dwrecv");
-    #[cfg(target_os = "android")]
-    let builder = builder.invoke_handler(tauri::generate_handler![commands::ping, commands::status]);
-    #[cfg(not(target_os = "android"))]
-    let builder = builder.invoke_handler(tauri::generate_handler![
-        commands::ping,
-        commands::status,
-        commands::register_listener,
-        commands::unregister_listener,
-        commands::remove_listener,
-    ]);
-
-    builder
+    Builder::<R, models::PluginConfig>::new("dwrecv")
+        .invoke_handler(tauri::generate_handler![commands::status])
         .setup(|app, api| {
             #[cfg(target_os = "android")]
             let dwrecv = android::init(app, api)?;
