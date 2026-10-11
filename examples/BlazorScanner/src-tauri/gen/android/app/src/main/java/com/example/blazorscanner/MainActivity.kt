@@ -1,4 +1,4 @@
-package com.bendi.blazorscanner
+package com.example.blazorscanner
 
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge

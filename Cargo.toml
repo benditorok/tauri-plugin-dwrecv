@@ -5,7 +5,14 @@ authors = ["benditorok"]
 description = "Handle Zebra DataWedge broadcast intents to receive and parse barcode data on Android."
 edition = "2024"
 rust-version = "1.95.0"
-exclude = ["/examples", "/dist-js", "/guest-js", "/node_modules"]
+exclude = [
+    "/examples",
+    "/dist-js",
+    "/guest-js",
+    "/node_modules",
+    "/pnpm-lock.yaml",
+    "/pnpm-workspace.yaml",
+]
 links = "tauri-plugin-dwrecv"
 
 [package.metadata.platforms.support]
@@ -16,10 +23,10 @@ linux = { level = "none" }
 macos = { level = "none" }
 
 [dependencies]
-tauri = { version = "2.11.5" }
+tauri = { version = "2.12.2" }
 serde = "1"
 thiserror = "2"
 
 [build-dependencies]
-tauri-plugin = { version = "2.6.3", features = ["build"] }
-tauri-build = "2.6.3"
+tauri-plugin = { version = "2.7.1", features = ["build"] }
+tauri-build = "2.7.2"

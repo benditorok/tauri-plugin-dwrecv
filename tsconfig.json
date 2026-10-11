@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "rootDir": "guest-js",
     "target": "es2021",
     "module": "esnext",
     "moduleResolution": "bundler",
@@ -9,6 +10,11 @@
     "noImplicitAny": true,
     "noEmit": true
   },
-  "include": ["guest-js/*.ts"],
-  "exclude": ["dist-js", "node_modules"]
+  "include": [
+    "guest-js/*.ts"
+  ],
+  "exclude": [
+    "dist-js",
+    "node_modules"
+  ]
 }

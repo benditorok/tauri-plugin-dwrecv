@@ -12,13 +12,23 @@ The plugin is registered on every platform. The UI checks `checkStatus()` before
 subscribing and displays an unavailable message on non-Android platforms.
 Android status checks only platform support; it does not probe DataWedge or hardware.
 
+Run these commands from the repository root using pnpm 12.8.1 and Node.js 22.13
+or newer. The example uses the local plugin through the pnpm workspace and builds
+its JavaScript API before starting Vite or building the frontend.
+
 ```bash
-deno install
-deno task tauri android init
+pnpm install
+pnpm --filter react-scanner tauri android init
 
 # For Desktop development, run:
-deno task tauri dev
+pnpm --filter react-scanner tauri dev
 
 # For Android development, run:
-deno task tauri android dev
+pnpm --filter react-scanner tauri android dev
+
+# Build the frontend:
+pnpm --filter react-scanner build
 ```
+
+From this example directory, the equivalent commands are `pnpm tauri dev`,
+`pnpm tauri android dev`, and `pnpm build`.
