@@ -1,13 +1,8 @@
-use tauri::{command, AppHandle, Runtime};
+use tauri::{AppHandle, Runtime, command};
 
-use crate::models::*;
-use crate::DwrecvExt;
-use crate::Result;
+use crate::{DwrecvExt, Status};
 
 #[command]
-pub(crate) async fn ping<R: Runtime>(
-    app: AppHandle<R>,
-    payload: PingRequest,
-) -> Result<PingResponse> {
-    app.dwrecv().ping(payload)
+pub(crate) fn status<R: Runtime>(app: AppHandle<R>) -> Status {
+    app.dwrecv().status()
 }

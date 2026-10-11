@@ -4,11 +4,8 @@ import android.app.Activity
 import android.content.IntentFilter
 import android.util.Log
 import android.webkit.WebView
-import app.tauri.annotation.Command
 import app.tauri.annotation.InvokeArg
 import app.tauri.annotation.TauriPlugin
-import app.tauri.plugin.Invoke
-import app.tauri.plugin.JSObject
 import app.tauri.plugin.Plugin
 
 /*
@@ -16,7 +13,6 @@ import app.tauri.plugin.Plugin
  */
 @InvokeArg
 class Config {
-    var pingValue: String? = "pong"
     var intentAction: String? = "com.symbol.datawedge.api.RESULT_ACTION"
     var intentCategory: String? = null
 }
@@ -26,7 +22,6 @@ class Config {
  */
 @TauriPlugin
 class DWIntentReceiverPlugin(private val activity: Activity) : Plugin(activity) {
-    private var pingValue = "pong"
     private var intentAction = "com.symbol.datawedge.api.RESULT_ACTION"
     private var intentCategory: String? = null
     private var receiver: DWIntentBroadcastReceiver? = null
@@ -35,23 +30,16 @@ class DWIntentReceiverPlugin(private val activity: Activity) : Plugin(activity) 
         private const val TAG = "DWIntentReceiverPlugin"
     }
 
-    @Command
-    fun ping(invoke: Invoke) {
-        val ret = JSObject().apply { put("value", pingValue) }
-        invoke.resolve(ret)
-    }
-
     override fun load(webView: WebView) {
         val categoryLog = intentCategory?.let { "category: $it" } ?: "no category"
         Log.i(TAG, "Loading plugin with intent action: $intentAction, $categoryLog")
 
-        // Load configuration if available
-        getConfig(Config::class.java)?.let { config ->
-            pingValue = config.pingValue ?: pingValue
+        // Load configuration
+        getConfig(Config::class.java).let { config ->
             intentAction = config.intentAction ?: intentAction
             intentCategory = config.intentCategory
             val configCategoryLog = intentCategory?.let { "intentCategory: $it" } ?: "intentCategory: none"
-            Log.i(TAG, "Loaded config - intentAction: $intentAction, $configCategoryLog, pingValue: $pingValue")
+            Log.i(TAG, "Loaded config - intentAction: $intentAction, $configCategoryLog")
         }
 
         // Unregister existing receiver if any

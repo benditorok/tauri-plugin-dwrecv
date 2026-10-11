@@ -4,9 +4,9 @@ Default permissions for the plugin
 
 #### This default permission set includes the following:
 
-- `allow-ping`
+- `allow-status`
 - `allow-register-listener`
-- `allow-unregister-listener`
+- `allow-remove-listener`
 
 ## Permission Table
 
@@ -16,32 +16,6 @@ Default permissions for the plugin
 <th>Description</th>
 </tr>
 
-
-<tr>
-<td>
-
-`dwrecv:allow-ping`
-
-</td>
-<td>
-
-Enables the ping command without any pre-configured scope.
-
-</td>
-</tr>
-
-<tr>
-<td>
-
-`dwrecv:deny-ping`
-
-</td>
-<td>
-
-Denies the ping command without any pre-configured scope.
-
-</td>
-</tr>
 
 <tr>
 <td>
@@ -72,12 +46,12 @@ Denies the register_listener command without any pre-configured scope.
 <tr>
 <td>
 
-`dwrecv:allow-unregister-listener`
+`dwrecv:allow-remove-listener`
 
 </td>
 <td>
 
-Enables the unregister_listener command without any pre-configured scope.
+Enables the remove_listener command without any pre-configured scope.
 
 </td>
 </tr>
@@ -85,12 +59,38 @@ Enables the unregister_listener command without any pre-configured scope.
 <tr>
 <td>
 
-`dwrecv:deny-unregister-listener`
+`dwrecv:deny-remove-listener`
 
 </td>
 <td>
 
-Denies the unregister_listener command without any pre-configured scope.
+Denies the remove_listener command without any pre-configured scope.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
+`dwrecv:allow-status`
+
+</td>
+<td>
+
+Enables the status command without any pre-configured scope.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
+`dwrecv:deny-status`
+
+</td>
+<td>
+
+Denies the status command without any pre-configured scope.
 
 </td>
 </tr>

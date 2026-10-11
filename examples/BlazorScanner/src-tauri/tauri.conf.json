@@ -29,7 +29,6 @@
   },
   "plugins": {
     "dwrecv": {
-      "pingValue": "ping",
       "intentAction": "com.example.blazorScanner"
     }
   }

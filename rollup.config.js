@@ -19,6 +19,7 @@ export default {
   ],
   plugins: [
     typescript({
+      noEmit: false,
       declaration: true,
       declarationDir: dirname(pkg.exports.import)
     })

@@ -19,15 +19,16 @@
   "scripts": {
     "build": "rollup -c",
     "prepublishOnly": "pnpm build",
-    "pretest": "pnpm build"
+    "pretest": "pnpm build",
+    "test": "node tests/api.test.mjs"
   },
   "dependencies": {
-    "@tauri-apps/api": "^2.11.0"
+    "@tauri-apps/api": "^2.11.1"
   },
   "devDependencies": {
     "@rollup/plugin-typescript": "^12.3.0",
-    "rollup": "^4.60.2",
-    "typescript": "^5.9.3",
+    "rollup": "^4.63.3",
+    "typescript": "^7.0.2",
     "tslib": "^2.8.1"
   }
 }
