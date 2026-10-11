@@ -37,15 +37,21 @@ tauri-plugin-dwrecv = { git = "https://github.com/benditorok/tauri-plugin-dwrecv
 
 - Install the JavaScript/TypeScript API package.
 
-For development/testing (local installation):
+For development/testing, install the plugin and React example together from the
+repository root. Use pnpm 12.8.1 and Node.js 22.13 or newer; `.node-version` pins
+the tested Node.js version for version managers.
+
 ```bash
-deno install
+pnpm install
 ```
 
 For production (install from GitHub):
 ```bash
-deno add npm:tauri-plugin-dwrecv-api@github:benditorok/tauri-plugin-dwrecv
+pnpm add github:benditorok/tauri-plugin-dwrecv --allow-build='tauri-plugin-dwrecv-api@git+https://github.com/benditorok/tauri-plugin-dwrecv.git'
 ```
+
+Git installs build the API from source, so pnpm needs permission to run this
+repository's build script.
 
 Or add to your `package.json`:
 ```json
@@ -54,6 +60,14 @@ Or add to your `package.json`:
     "tauri-plugin-dwrecv-api": "github:benditorok/tauri-plugin-dwrecv"
   }
 }
+```
+
+For a manual Git dependency, also add this to your application's
+`pnpm-workspace.yaml`, then run `pnpm install`:
+
+```yaml
+allowBuilds:
+  'tauri-plugin-dwrecv-api@git+https://github.com/benditorok/tauri-plugin-dwrecv.git': true
 ```
 
 - Configure [`src-tauri/tauri.conf.json`].
@@ -325,12 +339,21 @@ Run the Rust tests from the repository root:
 cargo test
 ```
 
-Build the JavaScript API before running its tests, which import `dist-js/index.js`:
+Run the JavaScript API tests from the repository root. The test command builds
+`dist-js` before running `tests/api.test.mjs`:
 
 ```bash
-npm run build
+pnpm test
+```
+
+To run the test file directly after building:
+
+```bash
+pnpm build
 node tests/api.test.mjs
 ```
+
+For a reproducible install in CI, use `pnpm install --frozen-lockfile`.
 
 ### Kotlin checks
 
